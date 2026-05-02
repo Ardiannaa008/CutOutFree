@@ -135,7 +135,7 @@ function processFile(file) {
   const card = document.createElement("div");
   card.className = "image-card";
   card.innerHTML = `
-    <div class="card-preview">
+    <div class="card-preview processing" id="preview-${id}">
       <img id="orig-${id}" alt="${file.name}" />
       <div class="card-status-overlay" id="overlay-${id}">
         <div class="spinner" style="width:28px;height:28px;border-width:2px;"></div>
@@ -175,6 +175,9 @@ function processFile(file) {
       const url = URL.createObjectURL(blob);
       const img = document.getElementById(`orig-${id}`);
       if (img) img.src = url;
+
+      const preview = document.getElementById(`preview-${id}`);
+      if (preview) preview.classList.remove("processing");
 
       const overlay = document.getElementById(`overlay-${id}`);
       if (overlay) overlay.classList.add("done");
