@@ -1,8 +1,8 @@
 import { removeBackground as imglyRemoveBackground } from "@imgly/background-removal";
 // ─── State ───────────────────────────────────────────────────────────────────
 const jobs = new Map();
-let doneCount = 0;
-let totalCount = 0;
+let activeBatchDone = 0;
+let activeBatchTotal = 0;
 
 // ─── DOM refs ─────────────────────────────────────────────────────────────────
 const dropzone = document.getElementById("dropzone");
@@ -64,8 +64,9 @@ function handleFiles(files) {
   files = files.filter((f) => f.type.startsWith("image/")).slice(0, 20);
   if (!files.length) return;
 
-  totalCount += files.length;
-  updateStatus(`Processing ${totalCount} image(s)…`);
+  activeBatchDone = 0;
+  activeBatchTotal = files.length;
+  updateStatus(`Processing ${activeBatchTotal} image(s)…`);
   statusBar.classList.add("visible");
   statusSpinner.style.display = "";
   resultsEl.classList.add("visible");
@@ -75,7 +76,8 @@ function handleFiles(files) {
 
 function updateStatus(msg) {
   statusText.textContent = msg;
-  const pct = totalCount > 0 ? (doneCount / totalCount) * 100 : 0;
+  const pct =
+    activeBatchTotal > 0 ? (activeBatchDone / activeBatchTotal) * 100 : 0;
   progressInner.style.width = pct + "%";
 }
 
@@ -142,15 +144,15 @@ function processFile(file) {
         url,
         name: file.name.replace(/\.[^.]+$/, ""),
       });
-      doneCount++;
+      activeBatchDone++;
       updateStatus(
-        doneCount < totalCount
-          ? `Processing… (${doneCount}/${totalCount})`
+        activeBatchDone < activeBatchTotal
+          ? `Processing… (${activeBatchDone}/${activeBatchTotal})`
           : `✓ Done!`,
       );
-      if (doneCount === totalCount) {
+      if (activeBatchDone === activeBatchTotal) {
         statusSpinner.style.display = "none";
-        showToast(`✓ ${doneCount} image(s) processed successfully!`);
+        showToast(`✓ ${activeBatchDone} image(s) processed successfully!`);
       }
     })
     .catch((err) => {
@@ -170,13 +172,14 @@ function handleError(id, message) {
       </div>
     `;
   }
-  doneCount++;
+  activeBatchDone++;
   updateStatus(
-    doneCount < totalCount
-      ? `Processing… (${doneCount}/${totalCount})`
+    activeBatchDone < activeBatchTotal
+      ? `Processing… (${activeBatchDone}/${activeBatchTotal})`
       : `Finished with errors`,
   );
-  if (doneCount === totalCount) statusSpinner.style.display = "none";
+  if (activeBatchDone === activeBatchTotal)
+    statusSpinner.style.display = "none";
   showToast(`❌ ${message}`);
 }
 
@@ -217,8 +220,8 @@ function clearAll() {
   }
   jobs.clear();
   imageGrid.innerHTML = "";
-  doneCount = 0;
-  totalCount = 0;
+  activeBatchDone = 0;
+  activeBatchTotal = 0;
   statusBar.classList.remove("visible");
   resultsEl.classList.remove("visible");
   progressInner.style.width = "0%";
