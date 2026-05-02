@@ -489,18 +489,18 @@
       .card-preview {
         position: relative;
         aspect-ratio: 1;
+        background-color: #888;
         background-image:
-          linear-gradient(45deg, #2a2a3a 25%, transparent 25%),
-          linear-gradient(-45deg, #2a2a3a 25%, transparent 25%),
-          linear-gradient(45deg, transparent 75%, #2a2a3a 75%),
-          linear-gradient(-45deg, transparent 75%, #2a2a3a 75%);
-        background-size: 20px 20px;
+          linear-gradient(45deg, #aaa 25%, transparent 25%),
+          linear-gradient(-45deg, #aaa 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, #aaa 75%),
+          linear-gradient(-45deg, transparent 75%, #aaa 75%);
+        background-size: 16px 16px;
         background-position:
-          -10px 0,
-          -10px 0,
+          -8px 0,
+          -8px 0,
           0 0,
           0 0;
-        background-color: #1a1a28;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -508,7 +508,8 @@
       }
 
       .card-preview.processing {
-        background: #111118;
+        background: #0e0e16;
+        background-image: none;
       }
 
       .card-preview img {
