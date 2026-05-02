@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Button Test</title>
+    <style>
+      body {
+        background: #0a0a0f;
+        color: white;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        gap: 20px;
+      }
+      #fileInput {
+        display: none;
+      }
+      label[for="fileInput"] {
+        background: #c8f24d;
+        color: #000;
+        padding: 14px 32px;
+        border-radius: 100px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        display: inline-block;
+      }
+      #output {
+        color: #c8f24d;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Click the button — does it open your files?</h2>
+    <label for="fileInput">Choose Images</label>
+    <input type="file" id="fileInput" accept="image/*" multiple />
+    <div id="output">No file selected yet</div>
+    <script>
+      document
+        .getElementById("fileInput")
+        .addEventListener("change", function () {
+          const files = Array.from(this.files);
+          document.getElementById("output").textContent =
+            "✓ " +
+            files.length +
+            " file(s): " +
+            files.map((f) => f.name).join(", ");
+        });
+    </script>
+  </body>
+</html>
