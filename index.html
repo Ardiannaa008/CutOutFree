@@ -340,6 +340,18 @@
         pointer-events: none;
       }
 
+      kbd {
+        display: inline-block;
+        padding: 1px 6px;
+        font-size: 11px;
+        font-family: var(--font-mono, monospace);
+        color: var(--accent);
+        border: 1px solid rgba(200, 242, 77, 0.3);
+        border-radius: 4px;
+        background: rgba(200, 242, 77, 0.06);
+        vertical-align: middle;
+      }
+
       #status-bar {
         display: none;
         align-items: center;
@@ -798,7 +810,7 @@
         <div id="dropzone">
           <div class="dropzone-icon">✂️</div>
           <h3>Drop your images here</h3>
-          <p>or click the button to browse your files</p>
+          <p>or paste from clipboard <kbd>Ctrl+V</kbd> · or browse below</p>
           <label for="fileInput" class="btn-upload">
             <svg
               width="16"

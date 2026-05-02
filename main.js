@@ -94,6 +94,20 @@ fileInput.addEventListener("change", () => {
   fileInput.value = "";
 });
 
+// ─── Paste support (Ctrl+V / Cmd+V) ──────────────────────────────────────────
+document.addEventListener("paste", (e) => {
+  const items = Array.from(e.clipboardData?.items || []);
+  const images = items
+    .filter((item) => item.type.startsWith("image/"))
+    .map((item) => item.getAsFile())
+    .filter(Boolean);
+  if (!images.length) return;
+  e.preventDefault();
+  dropzone.classList.add("drag-over");
+  setTimeout(() => dropzone.classList.remove("drag-over"), 400);
+  handleFiles(images);
+});
+
 // ─── Buttons ──────────────────────────────────────────────────────────────────
 document.getElementById("dl-all-btn").addEventListener("click", downloadAll);
 document.getElementById("clear-btn").addEventListener("click", clearAll);
