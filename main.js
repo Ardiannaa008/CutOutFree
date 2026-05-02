@@ -1,8 +1,10 @@
 import { removeBackground as imglyRemoveBackground } from "@imgly/background-removal";
+
 // ─── State ───────────────────────────────────────────────────────────────────
 const jobs = new Map();
 let activeBatchDone = 0;
 let activeBatchTotal = 0;
+let modelReady = false;
 
 // ─── DOM refs ─────────────────────────────────────────────────────────────────
 const dropzone = document.getElementById("dropzone");
@@ -15,6 +17,51 @@ const imageGrid = document.getElementById("image-grid");
 const resultsTitle = document.getElementById("results-title");
 const statusSpinner = document.getElementById("status-spinner");
 const toast = document.getElementById("toast");
+const modelBanner = document.getElementById("model-banner");
+const modelBannerText = document.getElementById("model-banner-text");
+const modelProgressInner = document.getElementById("model-progress-inner");
+const modelBannerPct = document.getElementById("model-banner-pct");
+
+// ─── Model warm-up ────────────────────────────────────────────────────────────
+async function warmUpModel() {
+  // Only show banner on first visit (model not cached yet)
+  const cached = localStorage.getItem("cutout-model-cached");
+  if (!cached) {
+    modelBanner.classList.add("visible");
+  }
+
+  // Create a tiny 1x1 transparent PNG as a warm-up image
+  const canvas = document.createElement("canvas");
+  canvas.width = 1;
+  canvas.height = 1;
+  const blob = await new Promise((res) => canvas.toBlob(res, "image/png"));
+
+  try {
+    await imglyRemoveBackground(blob, {
+      progress: (key, current, total) => {
+        if (!cached) {
+          const pct = total > 0 ? Math.round((current / total) * 100) : 0;
+          modelProgressInner.style.width = pct + "%";
+          modelBannerPct.textContent = pct + "%";
+          if (key.includes("fetch") || key.includes("load")) {
+            modelBannerText.textContent = "Downloading AI model…";
+          } else if (key.includes("inference")) {
+            modelBannerText.textContent = "Initialising AI model…";
+          }
+        }
+      },
+    });
+  } catch (_) {
+    // Warm-up errors are silent — real errors will surface when user uploads
+  }
+
+  modelReady = true;
+  localStorage.setItem("cutout-model-cached", "1");
+  modelBanner.classList.remove("visible");
+  modelBanner.classList.add("done");
+}
+
+warmUpModel();
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
 let toastTimer;

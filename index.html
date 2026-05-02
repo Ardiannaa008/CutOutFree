@@ -691,6 +691,29 @@
           padding: 40px 16px;
         }
       }
+
+      /* Model loading banner */
+      #model-banner {
+        display: none;
+        margin-bottom: 16px;
+      }
+      #model-banner.visible {
+        display: block;
+      }
+      #model-banner.done {
+        display: none;
+      }
+      .model-banner-inner {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 18px;
+        background: rgba(200, 242, 77, 0.05);
+        border: 1px solid rgba(200, 242, 77, 0.2);
+        border-radius: var(--radius);
+        font-size: 13px;
+        color: var(--muted);
+      }
     </style>
   </head>
   <body>
@@ -738,6 +761,35 @@
             <span class="check">✓</span> Bulk upload (20+ images)
           </div>
           <div class="pill"><span class="check">✓</span> No account needed</div>
+        </div>
+      </div>
+
+      <div id="model-banner">
+        <div class="model-banner-inner">
+          <div
+            class="spinner"
+            style="width: 16px; height: 16px; border-width: 2px; flex-shrink: 0"
+          ></div>
+          <div style="flex: 1">
+            <div id="model-banner-text">
+              Loading AI model for the first time — this takes ~10 seconds…
+            </div>
+            <div class="progress-outer" style="margin-top: 6px">
+              <div class="progress-inner" id="model-progress-inner"></div>
+            </div>
+          </div>
+          <div
+            id="model-banner-pct"
+            style="
+              font-size: 12px;
+              color: var(--accent);
+              font-weight: 600;
+              min-width: 36px;
+              text-align: right;
+            "
+          >
+            0%
+          </div>
         </div>
       </div>
 
