@@ -83,9 +83,7 @@ dropzone.addEventListener("dragleave", () =>
 dropzone.addEventListener("drop", (e) => {
   e.preventDefault();
   dropzone.classList.remove("drag-over");
-  handleFiles(
-    Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/")),
-  );
+  handleFiles(Array.from(e.dataTransfer.files));
 });
 
 // ─── File input ───────────────────────────────────────────────────────────────
@@ -112,18 +110,40 @@ document.addEventListener("paste", (e) => {
 document.getElementById("dl-all-btn").addEventListener("click", downloadAll);
 document.getElementById("clear-btn").addEventListener("click", clearAll);
 
+// ─── Validation limits ────────────────────────────────────────────────────────
+const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB per image — plenty for photos, guards against giant TIFFs/RAWs crashing the tab
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_FILES = 20;
+
 // ─── Handle files ─────────────────────────────────────────────────────────────
 function handleFiles(files) {
   if (!files.length) return;
 
-  const invalid = files.filter((f) => !f.type.startsWith("image/"));
-  if (invalid.length) {
+  const wrongType = files.filter((f) => !ALLOWED_TYPES.includes(f.type));
+  const tooBig = files.filter(
+    (f) => ALLOWED_TYPES.includes(f.type) && f.size > MAX_FILE_SIZE,
+  );
+
+  if (wrongType.length) {
     showToast(
-      `⚠️ ${invalid.length} file(s) skipped — only images are accepted`,
+      `⚠️ ${wrongType.length} file(s) skipped — only JPG, PNG, or WebP are accepted`,
     );
   }
-  files = files.filter((f) => f.type.startsWith("image/")).slice(0, 20);
+  if (tooBig.length) {
+    showToast(
+      `⚠️ ${tooBig.length} file(s) skipped — max size is ${formatSize(MAX_FILE_SIZE)}`,
+    );
+  }
+
+  files = files
+    .filter((f) => ALLOWED_TYPES.includes(f.type) && f.size <= MAX_FILE_SIZE)
+    .slice(0, MAX_FILES);
+
   if (!files.length) return;
+
+  if (files.length === MAX_FILES) {
+    showToast(`Processing the first ${MAX_FILES} images at once`);
+  }
 
   activeBatchDone = 0;
   activeBatchTotal = files.length;

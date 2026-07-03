@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Policy — CutOut</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap");
+      :root {
+        --bg: #0a0a0f;
+        --surface: #111118;
+        --border: rgba(255, 255, 255, 0.07);
+        --accent: #c8f24d;
+        --accent2: #7df9c2;
+        --text: #f0f0f5;
+        --muted: rgba(240, 240, 245, 0.6);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 56px 24px 80px;
+      }
+      a {
+        color: var(--accent2);
+      }
+      h1 {
+        font-family: "Syne", sans-serif;
+        font-size: 34px;
+        margin-bottom: 6px;
+      }
+      .updated {
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 36px;
+      }
+      h2 {
+        font-family: "Syne", sans-serif;
+        font-size: 18px;
+        margin-top: 36px;
+        margin-bottom: 10px;
+      }
+      p,
+      li {
+        color: var(--muted);
+        font-size: 15px;
+      }
+      ul {
+        padding-left: 20px;
+      }
+      .callout {
+        background: var(--surface);
+        border: 1px solid rgba(200, 242, 77, 0.2);
+        border-radius: 14px;
+        padding: 20px;
+        margin: 24px 0;
+      }
+      .callout p {
+        color: var(--text);
+        margin: 0;
+      }
+      .back {
+        display: inline-block;
+        margin-top: 40px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated: July 2026</p>
+
+      <div class="callout">
+        <p>
+          🔒 The short version: your photos never leave your device. CutOut has
+          no server-side image processing, no upload endpoint, and no database.
+        </p>
+      </div>
+
+      <h2>How image processing works</h2>
+      <p>
+        CutOut uses an AI model that runs entirely inside your browser via
+        WebAssembly (powered by the open-source
+        <a
+          href="https://github.com/imgly/background-removal-js"
+          target="_blank"
+          rel="noopener"
+          >@imgly/background-removal</a
+        >
+        library). When you upload or paste an image, it is processed locally on
+        your own device. It is never transmitted to CutOut's servers or to any
+        third party.
+      </p>
+
+      <h2>What we collect</h2>
+      <ul>
+        <li>We do not collect, store, or have access to your images.</li>
+        <li>We do not require an account, login, or email address.</li>
+        <li>We do not use cookies to track you across other sites.</li>
+        <li>
+          Your browser caches the AI model locally (via
+          <code>localStorage</code>) purely so it doesn't have to re-download it
+          on your next visit. This is a technical cache, not personal data.
+        </li>
+      </ul>
+
+      <h2>Hosting &amp; basic analytics</h2>
+      <p>
+        This site is hosted on Vercel. Like most web hosts, Vercel's
+        infrastructure may log standard technical data (such as IP address and
+        request timestamps) for security and performance purposes. We do not
+        layer any additional tracking or analytics on top of this.
+      </p>
+
+      <h2>Third-party links</h2>
+      <p>
+        If this page links to external sites (such as the background-removal
+        library above), those sites have their own privacy practices, which we
+        don't control.
+      </p>
+
+      <h2>Changes to this policy</h2>
+      <p>
+        If how this site works ever changes in a way that affects your privacy,
+        this page will be updated to reflect it.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        Questions about this policy can be sent to the contact details listed on
+        the CutOut homepage.
+      </p>
+
+      <a class="back" href="/">← Back to CutOut</a>
+    </div>
+  </body>
+</html>
