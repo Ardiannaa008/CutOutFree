@@ -6,6 +6,31 @@ let activeBatchDone = 0;
 let activeBatchTotal = 0;
 let modelReady = false;
 
+// ─── Concurrency-limited queue ───────────────────────────────────────────────
+// Running background-removal on every dropped file at once doesn't actually
+// speed things up (the WASM model session is shared), it just makes them all
+// fight over the same CPU/memory — which can stall or crash the tab on
+// lower-end devices with big batches. Cap how many run at the same time.
+const MAX_CONCURRENT = 3;
+let runningCount = 0;
+const fileQueue = [];
+
+function enqueueFile(file) {
+  fileQueue.push(file);
+  pumpQueue();
+}
+
+function pumpQueue() {
+  while (runningCount < MAX_CONCURRENT && fileQueue.length > 0) {
+    const file = fileQueue.shift();
+    runningCount++;
+    processFile(file).finally(() => {
+      runningCount--;
+      pumpQueue();
+    });
+  }
+}
+
 // ─── DOM refs ─────────────────────────────────────────────────────────────────
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("fileInput");
@@ -152,7 +177,7 @@ function handleFiles(files) {
   statusSpinner.style.display = "";
   resultsEl.classList.add("visible");
 
-  files.forEach(processFile);
+  files.forEach(enqueueFile);
 }
 
 function updateStatus(msg) {
@@ -196,7 +221,7 @@ function processFile(file) {
 
   jobs.set(id, { status: "processing", blob: null });
 
-  imglyRemoveBackground(file, {
+  return imglyRemoveBackground(file, {
     progress: (key, current, total) => {
       if (key.includes("inference")) {
         const pct = total > 0 ? Math.round((current / total) * 100) : 0;
