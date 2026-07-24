@@ -1,5 +1,5 @@
 import { removeBackground as imglyRemoveBackground } from "@imgly/background-removal";
-import { inject } from "@vercel/analytics";
+import { inject, track } from "@vercel/analytics";
 
 // Initialize Analytics
 inject();
@@ -234,6 +234,9 @@ function processFile(file) {
     },
   })
     .then((blob) => {
+      //For vercel analitycs tracking
+      track("Background Removed");
+
       const url = URL.createObjectURL(blob);
       const img = document.getElementById(`orig-${id}`);
       if (img) img.src = url;
@@ -303,6 +306,9 @@ function formatSize(bytes) {
 }
 
 function triggerDownload(url, filename) {
+  //To track when the user downloads an image
+  track("Image Downloaded");
+
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
