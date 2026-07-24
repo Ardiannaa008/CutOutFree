@@ -1,5 +1,8 @@
 import { removeBackground as imglyRemoveBackground } from "@imgly/background-removal";
+import { inject } from "@vercel/analytics";
 
+// Initialize Analytics
+inject();
 // ─── State ───────────────────────────────────────────────────────────────────
 const jobs = new Map();
 let activeBatchDone = 0;
