@@ -2,20 +2,79 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>CutOutFree — Free AI Background Remover, No Signup</title>
     <meta
       name="description"
-      content="Free background remover — no signup, no watermarks, full HD. AI runs in your browser."
+      content="Remove the background from any photo for free. Full-resolution PNG downloads, no watermark, no account, and no upload — the AI model runs locally in your browser."
     />
-    <meta property="og:title" content="CutOutFree — Free Background Remover" />
+    <link rel="canonical" href="https://cutoutfree.vercel.app/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cutoutfree.vercel.app/" />
+    <meta
+      property="og:title"
+      content="CutOutFree — Free AI Background Remover, No Signup"
+    />
+    <meta
+      property="og:description"
+      content="Remove the background from any photo for free. Full-resolution PNG downloads, no watermark, no account, and no upload — everything runs locally in your browser."
+    />
     <meta
       property="og:image"
       content="https://cutoutfree.vercel.app/og-image.png"
     />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CutOutFree — Free Background Remover</title>
-    <style>
-      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap");
 
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="CutOutFree — Free AI Background Remover, No Signup"
+    />
+    <meta
+      name="twitter:description"
+      content="Remove the background from any photo for free. Full-resolution PNG, no watermark, no account, no upload."
+    />
+    <meta
+      name="twitter:image"
+      content="https://cutoutfree.vercel.app/og-image.png"
+    />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- Fonts (preconnect + link instead of @import, so they don't block rendering) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Structured data for rich results -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "CutOutFree",
+        "url": "https://cutoutfree.vercel.app/",
+        "applicationCategory": "PhotoEditingApplication",
+        "operatingSystem": "Any (runs in browser)",
+        "description": "Free AI background remover that runs entirely in your browser. No signup, no watermark, full-resolution PNG downloads.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
+
+    <style>
       :root {
         --bg: #0a0c14;
         --bg-soft: #0f1220;
@@ -1002,13 +1061,7 @@
       .bento-tile.light {
         background: linear-gradient(135deg, #f3f4fa 0%, #e4e6f6 100%);
         color: #0a0c14;
-        clip-path: polygon(
-          0 0,
-          100% 0,
-          100% 100%,
-          22% 100%,
-          0 78%
-        );
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 22% 100%, 0 78%);
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
@@ -1141,11 +1194,13 @@
       </nav>
 
       <div class="hero">
-        <div class="eyebrow"><span class="dot"></span> Live · runs 100% in your browser</div>
+        <div class="eyebrow">
+          <span class="dot"></span> Live · runs 100% in your browser
+        </div>
         <h1>One photo,<br /><span class="grad-text">zero background.</span></h1>
         <p class="lead">
-          Drop any image and get a clean, full-resolution PNG cutout in
-          seconds — no signup, no watermark, no server ever seeing your file.
+          Drop any image and get a clean, full-resolution PNG cutout in seconds
+          — no signup, no watermark, no server ever seeing your file.
         </p>
         <div class="cta-row">
           <a href="#upload" class="btn-grad">Start cutting — it's free</a>
@@ -1155,7 +1210,12 @@
         <div class="hero-visual">
           <div class="ghost-word">CUTOUTFREE</div>
 
-          <svg class="connector" width="220" height="130" style="left: 6%; top: 4%">
+          <svg
+            class="connector"
+            width="220"
+            height="130"
+            style="left: 6%; top: 4%"
+          >
             <path d="M4,10 C60,40 120,90 200,110" />
             <circle class="c1" r="3.5" />
           </svg>
@@ -1218,19 +1278,28 @@
           <div class="flow-card">
             <div class="flow-num">1</div>
             <h3>Drop your photo</h3>
-            <p>JPG, PNG, or WebP — drag it in, paste it, or browse. Up to 20 at once.</p>
+            <p>
+              JPG, PNG, or WebP — drag it in, paste it, or browse. Up to 20 at
+              once.
+            </p>
           </div>
           <div class="flow-arrow">→</div>
           <div class="flow-card">
             <div class="flow-num">2</div>
             <h3>AI cuts it out</h3>
-            <p>A model running locally in your browser removes the background — nothing is uploaded.</p>
+            <p>
+              A model running locally in your browser removes the background —
+              nothing is uploaded.
+            </p>
           </div>
           <div class="flow-arrow">→</div>
           <div class="flow-card">
             <div class="flow-num">3</div>
             <h3>Download the PNG</h3>
-            <p>Get a full-resolution, transparent PNG — no watermark, no account required.</p>
+            <p>
+              Get a full-resolution, transparent PNG — no watermark, no account
+              required.
+            </p>
           </div>
         </div>
       </div>
@@ -1245,7 +1314,12 @@
           <div class="model-banner-inner">
             <div
               class="spinner"
-              style="width: 16px; height: 16px; border-width: 2px; flex-shrink: 0"
+              style="
+                width: 16px;
+                height: 16px;
+                border-width: 2px;
+                flex-shrink: 0;
+              "
             ></div>
             <div style="flex: 1">
               <div id="model-banner-text">
@@ -1331,7 +1405,9 @@
       <div class="bento">
         <div class="bento-tile light">
           <h3>100% local processing</h3>
-          <p>Your photos are never uploaded — the AI model runs on your device.</p>
+          <p>
+            Your photos are never uploaded — the AI model runs on your device.
+          </p>
         </div>
         <div class="bento-tile dark">
           <div class="num grad-text">$0</div>
