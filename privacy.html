@@ -3,39 +3,75 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Privacy Policy — CutOut</title>
+    <title>Privacy Policy — CutOutFree</title>
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500&display=swap");
       :root {
-        --bg: #0a0a0f;
-        --surface: #111118;
-        --border: rgba(255, 255, 255, 0.07);
-        --accent: #c8f24d;
-        --accent2: #7df9c2;
-        --text: #f0f0f5;
-        --muted: rgba(240, 240, 245, 0.6);
+        --bg: #0a0c14;
+        --glass: rgba(255, 255, 255, 0.045);
+        --border: rgba(255, 255, 255, 0.09);
+        --text: #f3f4fa;
+        --muted: rgba(243, 244, 250, 0.6);
+        --blue: #6d7dfd;
+        --purple: #b26bfb;
+        --pink: #fb6bb0;
+        --green: #3ddc97;
       }
       * {
         box-sizing: border-box;
       }
       body {
         margin: 0;
-        font-family: "DM Sans", sans-serif;
+        font-family: "Inter", sans-serif;
         background: var(--bg);
         color: var(--text);
         line-height: 1.7;
+        position: relative;
+        overflow-x: hidden;
+      }
+      .mesh {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .mesh span {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+      }
+      .mesh .b1 {
+        width: 480px;
+        height: 480px;
+        top: -160px;
+        left: -140px;
+        background: radial-gradient(circle, rgba(109, 125, 253, 0.3) 0%, transparent 70%);
+      }
+      .mesh .b2 {
+        width: 500px;
+        height: 500px;
+        bottom: -200px;
+        right: -160px;
+        background: radial-gradient(circle, rgba(178, 107, 251, 0.25) 0%, transparent 70%);
       }
       .container {
-        max-width: 720px;
+        max-width: 680px;
         margin: 0 auto;
         padding: 56px 24px 80px;
+        position: relative;
+        z-index: 1;
       }
       a {
-        color: var(--accent2);
+        background: linear-gradient(100deg, var(--blue), var(--purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
       h1 {
-        font-family: "Syne", sans-serif;
+        font-family: "Space Grotesk", sans-serif;
         font-size: 34px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
         margin-bottom: 6px;
       }
       .updated {
@@ -44,8 +80,9 @@
         margin-bottom: 36px;
       }
       h2 {
-        font-family: "Syne", sans-serif;
+        font-family: "Space Grotesk", sans-serif;
         font-size: 18px;
+        font-weight: 600;
         margin-top: 36px;
         margin-bottom: 10px;
       }
@@ -57,10 +94,18 @@
       ul {
         padding-left: 20px;
       }
+      code {
+        font-size: 13px;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 5px;
+        color: var(--text);
+      }
       .callout {
-        background: var(--surface);
-        border: 1px solid rgba(200, 242, 77, 0.2);
-        border-radius: 14px;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: 16px;
         padding: 20px;
         margin: 24px 0;
       }
@@ -72,24 +117,29 @@
         display: inline-block;
         margin-top: 40px;
         font-size: 14px;
+        font-weight: 600;
       }
     </style>
   </head>
   <body>
+    <div class="mesh" aria-hidden="true">
+      <span class="b1"></span>
+      <span class="b2"></span>
+    </div>
     <div class="container">
       <h1>Privacy Policy</h1>
       <p class="updated">Last updated: July 2026</p>
 
       <div class="callout">
         <p>
-          🔒 The short version: your photos never leave your device. CutOut has
+          🔒 The short version: your photos never leave your device. CutOutFree has
           no server-side image processing, no upload endpoint, and no database.
         </p>
       </div>
 
       <h2>How image processing works</h2>
       <p>
-        CutOut uses an AI model that runs entirely inside your browser via
+        CutOutFree uses an AI model that runs entirely inside your browser via
         WebAssembly (powered by the open-source
         <a
           href="https://github.com/imgly/background-removal-js"
@@ -98,7 +148,7 @@
           >@imgly/background-removal</a
         >
         library). When you upload or paste an image, it is processed locally on
-        your own device. It is never transmitted to CutOut's servers or to any
+        your own device. It is never transmitted to CutOutFree's servers or to any
         third party.
       </p>
 
@@ -138,10 +188,10 @@
       <h2>Contact</h2>
       <p>
         Questions about this policy can be sent to the contact details listed on
-        the CutOut homepage.
+        the CutOutFree homepage.
       </p>
 
-      <a class="back" href="/">← Back to CutOut</a>
+      <a class="back" href="/">← Back to CutOutFree</a>
     </div>
   </body>
 </html>

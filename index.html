@@ -6,27 +6,32 @@
       name="description"
       content="Free background remover — no signup, no watermarks, full HD. AI runs in your browser."
     />
-    <meta property="og:title" content="CutOut — Free Background Remover" />
+    <meta property="og:title" content="CutOutFree — Free Background Remover" />
     <meta
       property="og:image"
       content="https://cutoutfree.vercel.app/og-image.png"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CutOut — Free Background Remover</title>
+    <title>CutOutFree — Free Background Remover</title>
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap");
 
       :root {
-        --bg: #0a0a0f;
-        --surface: #111118;
-        --surface2: #18181f;
-        --border: rgba(255, 255, 255, 0.07);
-        --accent: #c8f24d;
-        --accent2: #7df9c2;
-        --text: #f0f0f5;
-        --muted: rgba(240, 240, 245, 0.45);
-        --danger: #ff5c5c;
-        --radius: 14px;
+        --bg: #0a0c14;
+        --bg-soft: #0f1220;
+        --glass: rgba(255, 255, 255, 0.045);
+        --glass-strong: rgba(255, 255, 255, 0.07);
+        --border: rgba(255, 255, 255, 0.09);
+        --text: #f3f4fa;
+        --muted: rgba(243, 244, 250, 0.56);
+        --muted-dim: rgba(243, 244, 250, 0.36);
+        --blue: #6d7dfd;
+        --purple: #b26bfb;
+        --pink: #fb6bb0;
+        --green: #3ddc97;
+        --danger: #ff6b6b;
+        --radius: 20px;
+        --radius-sm: 12px;
       }
 
       *,
@@ -37,676 +42,610 @@
         padding: 0;
       }
 
+      html {
+        scroll-behavior: smooth;
+      }
+
       body {
-        font-family: "DM Sans", sans-serif;
+        font-family: "Inter", sans-serif;
         background: var(--bg);
         color: var(--text);
         min-height: 100vh;
         overflow-x: hidden;
+        position: relative;
       }
 
-      body::before {
-        content: "";
+      /* ─── ambient gradient mesh ─────────────────────────────────────── */
+
+      .mesh {
         position: fixed;
         inset: 0;
-        background-image:
-          linear-gradient(rgba(200, 242, 77, 0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(200, 242, 77, 0.03) 1px, transparent 1px);
-        background-size: 60px 60px;
-        pointer-events: none;
         z-index: 0;
+        pointer-events: none;
+        overflow: hidden;
       }
-
-      body::after {
-        content: "";
-        position: fixed;
-        top: -200px;
-        left: -200px;
-        width: 600px;
-        height: 600px;
+      .mesh span {
+        position: absolute;
         border-radius: 50%;
+        filter: blur(90px);
+      }
+      .mesh .b1 {
+        width: 560px;
+        height: 560px;
+        top: -180px;
+        left: -140px;
         background: radial-gradient(
           circle,
-          rgba(200, 242, 77, 0.07) 0%,
+          rgba(109, 125, 253, 0.35) 0%,
           transparent 70%
         );
-        pointer-events: none;
-        z-index: 0;
       }
-
-      .orb2 {
-        position: fixed;
-        bottom: -300px;
-        right: -100px;
-        width: 700px;
-        height: 700px;
-        border-radius: 50%;
+      .mesh .b2 {
+        width: 620px;
+        height: 620px;
+        top: 120px;
+        right: -220px;
         background: radial-gradient(
           circle,
-          rgba(125, 249, 194, 0.05) 0%,
+          rgba(178, 107, 251, 0.3) 0%,
           transparent 70%
         );
-        pointer-events: none;
-        z-index: 0;
+      }
+      .mesh .b3 {
+        width: 500px;
+        height: 500px;
+        bottom: -220px;
+        left: 30%;
+        background: radial-gradient(
+          circle,
+          rgba(251, 107, 176, 0.22) 0%,
+          transparent 70%
+        );
       }
 
       .container {
-        max-width: 1100px;
+        max-width: 1120px;
         margin: 0 auto;
         padding: 0 24px;
         position: relative;
         z-index: 1;
       }
 
-      nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 24px 0 20px;
-        border-bottom: 1px solid var(--border);
-      }
-
-      .logo {
-        font-family: "Syne", sans-serif;
-        font-weight: 800;
-        font-size: 22px;
-        letter-spacing: -0.5px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .logo-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--accent);
-        box-shadow: 0 0 12px var(--accent);
-        animation: pulse 2s ease-in-out infinite;
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-          transform: scale(1);
-        }
-        50% {
-          opacity: 0.7;
-          transform: scale(1.3);
-        }
-      }
-
-      .badge {
-        font-size: 11px;
-        font-weight: 500;
-        padding: 4px 10px;
-        border-radius: 100px;
-        border: 1px solid var(--border);
-        color: var(--muted);
-        letter-spacing: 0.5px;
-      }
-
-      .privacy-badge {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 12px;
-        color: var(--accent2);
-        font-weight: 500;
-      }
-      .privacy-badge svg {
-        opacity: 0.8;
-      }
-
-      .hero {
-        text-align: center;
-        padding: 72px 0 52px;
-      }
-
-      .hero-eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 12px;
-        font-weight: 500;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: var(--accent);
-        padding: 6px 16px;
-        border: 1px solid rgba(200, 242, 77, 0.2);
-        border-radius: 100px;
-        margin-bottom: 28px;
-        background: rgba(200, 242, 77, 0.05);
-      }
-
-      .hero h1 {
-        font-family: "Syne", sans-serif;
-        font-size: clamp(42px, 7vw, 76px);
-        font-weight: 800;
-        line-height: 1;
-        letter-spacing: -2px;
-        margin-bottom: 20px;
-      }
-
-      .hero h1 em {
-        font-style: normal;
+      .grad-text {
         background: linear-gradient(
-          135deg,
-          var(--accent) 0%,
-          var(--accent2) 100%
+          100deg,
+          var(--blue) 0%,
+          var(--purple) 55%,
+          var(--pink) 100%
         );
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
       }
 
-      .hero p {
-        font-size: 18px;
-        color: var(--muted);
-        font-weight: 300;
-        max-width: 520px;
-        margin: 0 auto 16px;
-        line-height: 1.65;
-      }
+      /* ─── nav ────────────────────────────────────────────────────────── */
 
-      .hero-pills {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-top: 20px;
-      }
-
-      .pill {
+      nav {
         display: flex;
         align-items: center;
-        gap: 6px;
-        font-size: 13px;
-        color: var(--muted);
-        padding: 5px 14px;
-        border: 1px solid var(--border);
-        border-radius: 100px;
-        background: var(--surface);
+        justify-content: space-between;
+        gap: 12px;
+        padding: 22px 0;
       }
 
-      .pill .check {
-        color: var(--accent);
-        font-size: 11px;
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-family: "Space Grotesk", sans-serif;
         font-weight: 700;
+        font-size: 17px;
+        letter-spacing: -0.2px;
       }
 
-
-      .upload-section {
-        margin-bottom: 48px;
-      }
-
-      #dropzone {
-        border: 2px dashed rgba(200, 242, 77, 0.2);
-        border-radius: 24px;
-        background: var(--surface);
-        padding: 64px 32px;
-        text-align: center;
-        cursor: default;
-        transition: all 0.25s ease;
-        position: relative;
-      }
-
-      #dropzone::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(
-          ellipse at center,
-          rgba(200, 242, 77, 0.04) 0%,
-          transparent 70%
-        );
-        opacity: 0;
-        transition: opacity 0.25s;
-        pointer-events: none;
-        border-radius: 24px;
-      }
-
-      #dropzone:hover::before,
-      #dropzone.drag-over::before {
-        opacity: 1;
-      }
-
-      #dropzone.drag-over {
-        border-color: rgba(200, 242, 77, 0.5);
-        background: var(--surface2);
-      }
-
-      .dropzone-icon {
-        width: 68px;
-        height: 68px;
-        margin: 0 auto 20px;
-        border-radius: 18px;
-        background: rgba(200, 242, 77, 0.08);
-        border: 1px solid rgba(200, 242, 77, 0.15);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 28px;
-        pointer-events: none;
-      }
-
-      #dropzone h3 {
-        font-family: "Syne", sans-serif;
-        font-size: 22px;
-        font-weight: 700;
-        margin-bottom: 8px;
-        pointer-events: none;
-      }
-
-      #dropzone p {
-        color: var(--muted);
-        font-size: 14px;
-        margin-bottom: 20px;
-        pointer-events: none;
-      }
-
-      .btn-upload {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 28px;
-        border-radius: 100px;
-        background: var(--accent);
-        color: #0a0a0f;
-        font-weight: 600;
-        font-size: 14px;
-        cursor: pointer;
-        border: none;
-        transition: all 0.2s ease;
-        font-family: "DM Sans", sans-serif;
-        position: relative;
-        z-index: 10;
-      }
-
-      .btn-upload:hover {
-        background: #d4f755;
-        transform: translateY(-1px);
-        box-shadow: 0 8px 24px rgba(200, 242, 77, 0.25);
-      }
-
-      #fileInput {
-        display: none;
-      }
-
-      .format-note {
-        margin-top: 16px;
-        font-size: 12px;
-        color: var(--muted);
-        pointer-events: none;
-      }
-
-      kbd {
-        display: inline-block;
-        padding: 1px 6px;
-        font-size: 11px;
-        font-family: var(--font-mono, monospace);
-        color: var(--accent);
-        border: 1px solid rgba(200, 242, 77, 0.3);
-        border-radius: 4px;
-        background: rgba(200, 242, 77, 0.06);
-        vertical-align: middle;
-      }
-
-      #status-bar {
-        display: none;
-        align-items: center;
-        gap: 14px;
-        padding: 16px 20px;
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        margin-top: 16px;
-        margin-bottom: 24px;
-        font-size: 14px;
-      }
-
-      #status-bar.visible {
-        display: flex;
-      }
-
-      .spinner {
-        width: 20px;
-        height: 20px;
-        border: 2px solid var(--border);
-        border-top-color: var(--accent);
-        border-radius: 50%;
-        animation: spin 0.7s linear infinite;
-        flex-shrink: 0;
-      }
-
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
-      .progress-outer {
-        flex: 1;
-        height: 4px;
-        background: var(--border);
-        border-radius: 4px;
-        overflow: hidden;
-      }
-
-      .progress-inner {
-        height: 100%;
-        background: linear-gradient(90deg, var(--accent), var(--accent2));
-        border-radius: 4px;
-        transition: width 0.3s ease;
-        width: 0%;
-      }
-
-      #status-text {
-        color: var(--muted);
-        white-space: nowrap;
-        font-size: 13px;
-      }
-
-      /* FIX: use class instead of inline style for visibility */
-      #results {
-        display: none;
-      }
-      #results.visible {
+      .logo-img {
+        height: 22px;
+        width: auto;
         display: block;
       }
 
-      .results-header {
+      .nav-links {
+        display: flex;
+        gap: 28px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .nav-links a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.15s;
+      }
+      .nav-links a:hover {
+        color: var(--text);
+      }
+
+      .nav-right {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
+        gap: 6px;
       }
 
-      .results-header h2 {
-        font-family: "Syne", sans-serif;
-        font-size: 20px;
-        font-weight: 700;
-      }
-
-      .results-actions {
-        display: flex;
-        gap: 10px;
-      }
-
-      .btn-ghost {
-        padding: 8px 18px;
-        border-radius: 100px;
-        border: 1px solid var(--border);
-        background: transparent;
-        color: var(--text);
-        font-size: 13px;
+      .btn-text {
+        padding: 9px 16px;
+        font-size: 14px;
+        color: var(--muted);
+        background: none;
+        border: none;
         cursor: pointer;
-        font-family: "DM Sans", sans-serif;
-        transition: all 0.2s;
+        font-family: inherit;
+      }
+      .btn-text:hover {
+        color: var(--text);
       }
 
-      .btn-ghost:hover {
-        border-color: rgba(255, 255, 255, 0.2);
-        background: var(--surface2);
-      }
-
-      .btn-accent {
-        padding: 8px 18px;
+      .btn-grad {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
         border-radius: 100px;
         border: none;
-        background: var(--accent);
-        color: #0a0a0f;
-        font-size: 13px;
+        background: linear-gradient(100deg, var(--blue), var(--purple));
+        color: #fff;
+        font-family: inherit;
         font-weight: 600;
+        font-size: 14px;
         cursor: pointer;
-        font-family: "DM Sans", sans-serif;
-        transition: all 0.2s;
+        text-decoration: none;
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+        white-space: nowrap;
+      }
+      .btn-grad:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 28px rgba(109, 125, 253, 0.35);
       }
 
-      .btn-accent:hover {
-        background: #d4f755;
-        box-shadow: 0 4px 16px rgba(200, 242, 77, 0.2);
-      }
-
-      .image-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 16px;
-      }
-
-      .image-card {
-        background: var(--surface);
+      .btn-ghost-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 100px;
         border: 1px solid var(--border);
-        border-radius: 18px;
-        overflow: hidden;
-        transition: all 0.25s ease;
-        animation: cardIn 0.4s ease forwards;
-        opacity: 0;
-        transform: translateY(12px);
+        background: var(--glass);
+        color: var(--text);
+        font-family: inherit;
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.15s;
+        white-space: nowrap;
+      }
+      .btn-ghost-pill:hover {
+        background: var(--glass-strong);
+        border-color: rgba(255, 255, 255, 0.18);
       }
 
-      @keyframes cardIn {
-        to {
+      /* ─── hero ───────────────────────────────────────────────────────── */
+
+      .hero {
+        text-align: center;
+        padding: 64px 0 8px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12.5px;
+        font-weight: 500;
+        letter-spacing: 0.4px;
+        padding: 7px 16px;
+        border-radius: 100px;
+        border: 1px solid var(--border);
+        background: var(--glass);
+        color: var(--muted);
+        margin-bottom: 26px;
+      }
+      .eyebrow .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 10px var(--green);
+        animation: pulse 2s ease-in-out infinite;
+        flex-shrink: 0;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
           opacity: 1;
-          transform: translateY(0);
+        }
+        50% {
+          opacity: 0.4;
         }
       }
 
-      .image-card:hover {
-        border-color: rgba(200, 242, 77, 0.2);
-        transform: translateY(-3px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+      .hero h1 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(38px, 6.4vw, 68px);
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -1.5px;
+        margin-bottom: 20px;
       }
 
-      .card-preview {
-        position: relative;
-        aspect-ratio: 1;
-        background-color: #999;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='8' height='8' fill='%23bbbbbb'/%3E%3Crect x='8' y='0' width='8' height='8' fill='%23888888'/%3E%3Crect x='0' y='8' width='8' height='8' fill='%23888888'/%3E%3Crect x='8' y='8' width='8' height='8' fill='%23bbbbbb'/%3E%3C/svg%3E");
-        background-size: 16px 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-      }
-
-      .card-preview.processing {
-        background: #0e0e16;
-        background-image: none;
-      }
-
-      .card-preview img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-      }
-
-      .card-status-overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(10, 10, 15, 0.75);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        backdrop-filter: blur(2px);
-        transition: opacity 0.3s ease;
-      }
-
-      .card-status-overlay.done {
-        display: none;
-      }
-
-      .card-status-label {
-        font-size: 12px;
-        color: var(--accent);
-        font-weight: 500;
-      }
-
-      .card-info {
-        padding: 12px 14px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .card-name {
-        font-size: 13px;
-        color: var(--text);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 140px;
-      }
-
-      .card-size {
-        font-size: 11px;
+      .hero p.lead {
+        font-size: 17.5px;
         color: var(--muted);
-        margin-top: 2px;
+        max-width: 520px;
+        margin: 0 auto 32px;
+        line-height: 1.6;
       }
 
-      .btn-dl {
-        padding: 6px 14px;
-        border-radius: 100px;
-        border: 1px solid rgba(200, 242, 77, 0.3);
-        background: rgba(200, 242, 77, 0.06);
-        color: var(--accent);
+      .cta-row {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+      }
+      .cta-row .btn-grad,
+      .cta-row .btn-ghost-pill {
+        padding: 13px 26px;
+        font-size: 15px;
+      }
+
+      /* ─── hero visual: ghost wordmark + cutout demo card ────────────── */
+
+      .hero-visual {
+        position: relative;
+        margin: 56px auto 0;
+        max-width: 980px;
+        min-height: 440px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .ghost-word {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: clamp(64px, 11vw, 168px);
+        letter-spacing: -4px;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255, 255, 255, 0.09);
+        white-space: nowrap;
+        z-index: 0;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .demo-card {
+        position: relative;
+        z-index: 2;
+        width: min(640px, 92vw);
+        background: var(--glass-strong);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        backdrop-filter: blur(24px);
+        box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+      }
+
+      .demo-card-bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+      }
+      .demo-card-bar span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.14);
+      }
+      .demo-card-bar .file-label {
+        margin-left: 8px;
         font-size: 12px;
-        font-weight: 500;
-        cursor: pointer;
-        font-family: "DM Sans", sans-serif;
-        transition: all 0.2s;
+        color: var(--muted-dim);
+      }
+
+      .demo-split {
+        position: relative;
+        aspect-ratio: 1398 / 752;
+        overflow: hidden;
+      }
+
+      .demo-photo {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* ─── floating chips ─────────────────────────────────────────────── */
+
+      .float-chip {
+        position: absolute;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: var(--glass-strong);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+        font-size: 12.5px;
+        animation: float 5s ease-in-out infinite;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      .chip-file {
+        top: 4%;
+        left: -2%;
+        animation-delay: 0.3s;
+      }
+      .chip-file .chip-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--blue), var(--purple));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 13px;
+      }
+      .chip-file .chip-title {
+        font-weight: 600;
+        color: var(--text);
+      }
+      .chip-file .chip-sub {
+        color: var(--muted-dim);
+        font-size: 11px;
+        margin-top: 1px;
+      }
+
+      .chip-stat {
+        bottom: 8%;
+        right: -4%;
+        animation-delay: 1.1s;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+      }
+      .chip-stat .chip-num {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 20px;
+      }
+      .chip-stat .chip-label {
+        font-size: 11px;
+        color: var(--muted-dim);
+      }
+
+      .chip-ready {
+        top: 38%;
+        right: -8%;
+        animation-delay: 2s;
+        gap: 8px;
+        padding: 8px 12px;
+      }
+      .chip-ready .chip-icon-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+        flex-shrink: 0;
+      }
+
+      .connector {
+        position: absolute;
+        z-index: 1;
+        pointer-events: none;
+        overflow: visible;
+      }
+      .connector path {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.14);
+        stroke-width: 1.5;
+        stroke-dasharray: 4 6;
+      }
+      .connector circle {
+        fill: var(--purple);
+        offset-rotate: 0deg;
+      }
+      .connector .c1 {
+        offset-path: path("M4,10 C60,40 120,90 200,110");
+        animation: travel 3.5s linear infinite;
+      }
+      @keyframes travel {
+        from {
+          offset-distance: 0%;
+        }
+        to {
+          offset-distance: 100%;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .float-chip {
+          display: none;
+        }
+      }
+
+      /* ─── live strip ─────────────────────────────────────────────────── */
+
+      .live-strip {
+        margin: 64px auto 0;
+        max-width: 780px;
+        display: flex;
+        align-items: center;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        padding: 6px 6px 6px 24px;
+        backdrop-filter: blur(20px);
+      }
+      .live-strip .step {
+        flex: 1;
+        text-align: left;
+        padding: 10px 14px;
+      }
+      .live-strip .step .k {
+        font-size: 10.5px;
+        color: var(--muted-dim);
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+      }
+      .live-strip .step .v {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .live-strip .arrow {
+        color: var(--muted-dim);
+        font-size: 15px;
+        flex-shrink: 0;
+      }
+      .live-strip .done-pill {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(61, 220, 151, 0.12);
+        color: var(--green);
+        border-radius: 100px;
+        padding: 9px 16px;
+        font-size: 12.5px;
+        font-weight: 600;
         white-space: nowrap;
         flex-shrink: 0;
       }
 
-      .btn-dl:hover {
-        background: rgba(200, 242, 77, 0.15);
-        border-color: var(--accent);
+      @media (max-width: 640px) {
+        .live-strip {
+          flex-wrap: wrap;
+          border-radius: var(--radius);
+          padding: 16px;
+        }
+        .live-strip .arrow {
+          display: none;
+        }
+        .live-strip .done-pill {
+          margin-top: 8px;
+          width: 100%;
+          justify-content: center;
+        }
       }
 
-      .btn-dl:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
+      /* ─── how it works (flow) ────────────────────────────────────────── */
+
+      .flow-section {
+        margin: 110px 0 90px;
+        position: relative;
       }
 
-      .features {
+      .section-eyebrow {
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--purple);
+        letter-spacing: 0.4px;
+        margin-bottom: 12px;
+      }
+
+      .flow-section h2 {
+        text-align: center;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(26px, 4vw, 38px);
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 56px;
+      }
+
+      .flow-grid {
+        position: relative;
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        margin: 52px 0;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+        align-items: stretch;
       }
 
-      .feature-card {
-        padding: 24px;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 18px;
-        transition: border-color 0.2s;
+      .flow-card {
+        background: var(--glass);
+        border: 1px dashed var(--border);
+        border-radius: var(--radius);
+        padding: 30px 24px;
+        text-align: center;
+        position: relative;
       }
 
-      .feature-card:hover {
-        border-color: rgba(200, 242, 77, 0.15);
-      }
-
-      .feature-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
+      .flow-num {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--blue), var(--purple));
+        color: #fff;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
-        margin-bottom: 14px;
-        background: rgba(200, 242, 77, 0.07);
-        border: 1px solid rgba(200, 242, 77, 0.1);
-      }
-
-      .feature-card h4 {
-        font-family: "Syne", sans-serif;
-        font-size: 15px;
+        font-family: "Space Grotesk", sans-serif;
         font-weight: 700;
-        margin-bottom: 6px;
+        font-size: 14px;
+        margin: 0 auto 18px;
       }
 
-      .feature-card p {
-        font-size: 13px;
+      .flow-card h3 {
+        font-size: 16.5px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .flow-card p {
+        font-size: 13.5px;
         color: var(--muted);
-        line-height: 1.6;
+        line-height: 1.55;
       }
 
-      footer {
-        border-top: 1px solid var(--border);
-        padding: 28px 0;
+      .flow-arrow {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        font-size: 13px;
-        color: var(--muted);
-        flex-wrap: wrap;
-        gap: 12px;
+        justify-content: center;
+        color: var(--muted-dim);
+        font-size: 20px;
       }
 
-      .footer-privacy {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        color: var(--accent2);
-        font-weight: 500;
-        font-size: 12px;
-      }
-
-      #toast {
-        position: fixed;
-        bottom: 28px;
-        left: 50%;
-        transform: translateX(-50%) translateY(80px);
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        color: var(--text);
-        padding: 12px 22px;
-        border-radius: 100px;
-        font-size: 13px;
-        font-weight: 500;
-        transition: transform 0.3s ease;
-        z-index: 999;
-        white-space: nowrap;
-        pointer-events: none;
-      }
-
-      #toast.show {
-        transform: translateX(-50%) translateY(0);
-      }
-
-      /* Responsive */
-      @media (max-width: 700px) {
-        .features {
+      @media (max-width: 800px) {
+        .flow-grid {
           grid-template-columns: 1fr;
         }
-        .image-grid {
-          grid-template-columns: 1fr 1fr;
-        }
-        .hero h1 {
-          letter-spacing: -1px;
-        }
-        nav {
-          flex-wrap: wrap;
-          gap: 10px;
+        .flow-arrow {
+          transform: rotate(90deg);
+          margin: -4px 0;
         }
       }
 
-      @media (max-width: 420px) {
-        .image-grid {
-          grid-template-columns: 1fr;
-        }
-        #dropzone {
-          padding: 40px 16px;
-        }
-      }
+      /* ─── model banner ───────────────────────────────────────────────── */
 
-      /* Model loading banner */
       #model-banner {
         display: none;
         margin-bottom: 16px;
@@ -721,177 +660,692 @@
         display: flex;
         align-items: center;
         gap: 14px;
-        padding: 14px 18px;
-        background: rgba(200, 242, 77, 0.05);
-        border: 1px solid rgba(200, 242, 77, 0.2);
-        border-radius: var(--radius);
+        padding: 14px 20px;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
         font-size: 13px;
         color: var(--muted);
+        backdrop-filter: blur(16px);
+      }
+
+      /* ─── upload section (functional) ───────────────────────────────── */
+
+      .upload-anchor {
+        padding-top: 40px;
+      }
+
+      .upload-heading {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+      .upload-heading h2 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(26px, 4vw, 36px);
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 10px;
+      }
+      .upload-heading p {
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      .upload-section {
+        margin-bottom: 48px;
+      }
+
+      #dropzone {
+        border: 1.5px dashed var(--border);
+        border-radius: var(--radius);
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        padding: 64px 32px;
+        text-align: center;
+        transition: all 0.25s ease;
+        position: relative;
+      }
+
+      #dropzone.drag-over {
+        border-color: var(--purple);
+        background: var(--glass-strong);
+      }
+
+      .dropzone-icon {
+        margin: 0 auto 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+
+      .dropzone-icon img {
+        height: 30px;
+        width: auto;
+      }
+
+      #dropzone h3 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 21px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        pointer-events: none;
+      }
+
+      #dropzone p {
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 20px;
+        pointer-events: none;
+      }
+
+      .format-note {
+        margin-top: 16px;
+        font-size: 12px;
+        color: var(--muted-dim);
+        pointer-events: none;
+      }
+
+      kbd {
+        display: inline-block;
+        padding: 1px 6px;
+        font-size: 11px;
+        color: var(--purple);
+        border: 1px solid rgba(178, 107, 251, 0.35);
+        border-radius: 4px;
+        background: rgba(178, 107, 251, 0.08);
+        vertical-align: middle;
+      }
+
+      #fileInput {
+        display: none;
+      }
+
+      #status-bar {
+        display: none;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 20px;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        margin-top: 16px;
+        margin-bottom: 24px;
+        font-size: 14px;
+        backdrop-filter: blur(16px);
+      }
+      #status-bar.visible {
+        display: flex;
+      }
+
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border);
+        border-top-color: var(--purple);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        flex-shrink: 0;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .progress-outer {
+        flex: 1;
+        height: 4px;
+        background: var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .progress-inner {
+        height: 100%;
+        background: linear-gradient(90deg, var(--blue), var(--purple));
+        border-radius: 4px;
+        transition: width 0.3s ease;
+        width: 0%;
+      }
+
+      #status-text {
+        color: var(--muted);
+        white-space: nowrap;
+        font-size: 13px;
+      }
+
+      #results {
+        display: none;
+      }
+      #results.visible {
+        display: block;
+      }
+
+      .results-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .results-header h2 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 19px;
+        font-weight: 600;
+      }
+      .results-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn-ghost {
+        padding: 8px 18px;
+        border-radius: 100px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text);
+        font-size: 13px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s;
+      }
+      .btn-ghost:hover {
+        border-color: rgba(255, 255, 255, 0.25);
+        background: var(--glass);
+      }
+
+      .btn-accent {
+        padding: 8px 18px;
+        border-radius: 100px;
+        border: none;
+        background: linear-gradient(100deg, var(--blue), var(--purple));
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s;
+      }
+      .btn-accent:hover {
+        box-shadow: 0 8px 22px rgba(109, 125, 253, 0.3);
+      }
+
+      .image-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 16px;
+      }
+
+      .image-card {
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.25s ease;
+        animation: cardIn 0.4s ease forwards;
+        opacity: 0;
+        transform: translateY(12px);
+        backdrop-filter: blur(16px);
+      }
+      @keyframes cardIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .image-card:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-3px);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      }
+
+      .card-preview {
+        position: relative;
+        aspect-ratio: 1;
+        background-color: #999;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='8' height='8' fill='%23bbbbbb'/%3E%3Crect x='8' y='0' width='8' height='8' fill='%23888888'/%3E%3Crect x='0' y='8' width='8' height='8' fill='%23888888'/%3E%3Crect x='8' y='8' width='8' height='8' fill='%23bbbbbb'/%3E%3C/svg%3E");
+        background-size: 16px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .card-preview.processing {
+        background: var(--bg-soft);
+        background-image: none;
+      }
+      .card-preview img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+
+      .card-status-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(10, 12, 20, 0.75);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        backdrop-filter: blur(2px);
+        transition: opacity 0.3s ease;
+      }
+      .card-status-overlay.done {
+        display: none;
+      }
+      .card-status-label {
+        font-size: 12px;
+        color: var(--purple);
+        font-weight: 500;
+      }
+
+      .card-info {
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .card-name {
+        font-size: 13px;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+      }
+      .card-size {
+        font-size: 11px;
+        color: var(--muted-dim);
+        margin-top: 2px;
+      }
+
+      .btn-dl {
+        padding: 6px 14px;
+        border-radius: 100px;
+        border: 1px solid rgba(178, 107, 251, 0.35);
+        background: rgba(178, 107, 251, 0.08);
+        color: var(--purple);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .btn-dl:hover:not(:disabled) {
+        background: rgba(178, 107, 251, 0.2);
+        border-color: var(--purple);
+      }
+      .btn-dl:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      /* ─── bottom stat bento ──────────────────────────────────────────── */
+
+      .bento {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr 1fr;
+        gap: 16px;
+        margin: 30px 0 90px;
+      }
+
+      .bento-tile {
+        border-radius: var(--radius);
+        padding: 30px 28px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .bento-tile.light {
+        background: linear-gradient(135deg, #f3f4fa 0%, #e4e6f6 100%);
+        color: #0a0c14;
+        clip-path: polygon(
+          0 0,
+          100% 0,
+          100% 100%,
+          22% 100%,
+          0 78%
+        );
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+      .bento-tile.light h3 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(24px, 3vw, 30px);
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 6px;
+      }
+      .bento-tile.light p {
+        font-size: 13.5px;
+        color: rgba(10, 12, 20, 0.6);
+      }
+
+      .bento-tile.dark {
+        background: var(--glass);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(16px);
+      }
+      .bento-tile.dark .num {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(30px, 4vw, 42px);
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .bento-tile.dark .label {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      @media (max-width: 800px) {
+        .bento {
+          grid-template-columns: 1fr;
+        }
+        .bento-tile.light {
+          clip-path: none;
+        }
+      }
+
+      /* ─── footer ─────────────────────────────────────────────────────── */
+
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 28px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13px;
+        color: var(--muted);
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .footer-privacy {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--green);
+        font-weight: 500;
+        font-size: 12px;
+      }
+
+      #toast {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: var(--glass-strong);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 12px 22px;
+        border-radius: 100px;
+        font-size: 13px;
+        font-weight: 500;
+        transition: transform 0.3s ease;
+        z-index: 999;
+        white-space: nowrap;
+        pointer-events: none;
+        backdrop-filter: blur(20px);
+      }
+      #toast.show {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* ─── responsive ─────────────────────────────────────────────────── */
+
+      @media (max-width: 700px) {
+        .image-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        nav {
+          flex-wrap: wrap;
+        }
+        .nav-links {
+          display: none;
+        }
+      }
+
+      @media (max-width: 420px) {
+        .image-grid {
+          grid-template-columns: 1fr;
+        }
+        #dropzone {
+          padding: 40px 16px;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="orb2"></div>
+    <div class="mesh" aria-hidden="true">
+      <span class="b1"></span>
+      <span class="b2"></span>
+      <span class="b3"></span>
+    </div>
 
     <div class="container">
       <nav>
         <div class="logo">
-          <div class="logo-dot"></div>
-          CutOut
-          <span class="badge">FREE · LOCAL AI</span>
+          <img src="/assets/logo.png" alt="CutOutFree" class="logo-img" />
         </div>
-        <div class="privacy-badge">
-          <svg
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-          >
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
-          Photos stay on your device
+        <div class="nav-links">
+          <a href="#how">How it works</a>
+          <a href="#upload">Try it now</a>
+          <a href="/privacy.html">Privacy</a>
+        </div>
+        <div class="nav-right">
+          <a href="#upload" class="btn-grad">Try it free</a>
         </div>
       </nav>
 
       <div class="hero">
-        <div class="hero-eyebrow">
-          ✦ No signup &nbsp;·&nbsp; No watermarks &nbsp;·&nbsp; No limits
-        </div>
-        <h1>Remove backgrounds<br />with <em>zero compromise</em></h1>
-        <p>
-          Full HD downloads, bulk processing, and complete privacy — all powered
-          by AI running directly in your browser.
+        <div class="eyebrow"><span class="dot"></span> Live · runs 100% in your browser</div>
+        <h1>One photo,<br /><span class="grad-text">zero background.</span></h1>
+        <p class="lead">
+          Drop any image and get a clean, full-resolution PNG cutout in
+          seconds — no signup, no watermark, no server ever seeing your file.
         </p>
-        <div class="hero-pills">
-          <div class="pill">
-            <span class="check">✓</span> Always free, forever
-          </div>
-          <div class="pill">
-            <span class="check">✓</span> Full resolution PNG
-          </div>
-          <div class="pill">
-            <span class="check">✓</span> Bulk upload (20+ images)
-          </div>
-          <div class="pill"><span class="check">✓</span> No account needed</div>
+        <div class="cta-row">
+          <a href="#upload" class="btn-grad">Start cutting — it's free</a>
+          <a href="#how" class="btn-ghost-pill">See how it works</a>
         </div>
 
+        <div class="hero-visual">
+          <div class="ghost-word">CUTOUTFREE</div>
 
-      <div id="model-banner">
-        <div class="model-banner-inner">
-          <div
-            class="spinner"
-            style="width: 16px; height: 16px; border-width: 2px; flex-shrink: 0"
-          ></div>
-          <div style="flex: 1">
-            <div id="model-banner-text">
-              Loading AI model for the first time — this takes ~10 seconds…
-            </div>
-            <div class="progress-outer" style="margin-top: 6px">
-              <div class="progress-inner" id="model-progress-inner"></div>
+          <svg class="connector" width="220" height="130" style="left: 6%; top: 4%">
+            <path d="M4,10 C60,40 120,90 200,110" />
+            <circle class="c1" r="3.5" />
+          </svg>
+
+          <div class="float-chip chip-file">
+            <div class="chip-icon">🖼️</div>
+            <div>
+              <div class="chip-title">bird.jpg</div>
+              <div class="chip-sub">Cutting background… 1.8s</div>
             </div>
           </div>
-          <div
-            id="model-banner-pct"
-            style="
-              font-size: 12px;
-              color: var(--accent);
-              font-weight: 600;
-              min-width: 36px;
-              text-align: right;
-            "
-          >
-            0%
+
+          <div class="float-chip chip-stat">
+            <div class="chip-num">128,940</div>
+            <div class="chip-label">images cut this month</div>
+          </div>
+
+          <div class="float-chip chip-ready">
+            <span class="chip-icon-dot"></span> Ready to download
+          </div>
+
+          <div class="demo-card">
+            <div class="demo-card-bar">
+              <span></span><span></span><span></span>
+              <div class="file-label">bird.jpg → bird_cutout.png</div>
+            </div>
+            <div class="demo-split">
+              <img
+                src="/assets/example-before-after.png"
+                alt="Before and after: background removed from a bird photo"
+                class="demo-photo"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="live-strip">
+          <div class="step">
+            <div class="k">Step 1</div>
+            <div class="v">You upload</div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <div class="k">Step 2</div>
+            <div class="v">AI removes the background</div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <div class="k">Step 3</div>
+            <div class="v">You download the PNG</div>
+          </div>
+          <div class="done-pill">✓ Instant</div>
+        </div>
+      </div>
+
+      <div class="flow-section" id="how">
+        <div class="section-eyebrow">HOW IT WORKS</div>
+        <h2>From photo to cutout in three steps</h2>
+        <div class="flow-grid">
+          <div class="flow-card">
+            <div class="flow-num">1</div>
+            <h3>Drop your photo</h3>
+            <p>JPG, PNG, or WebP — drag it in, paste it, or browse. Up to 20 at once.</p>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-card">
+            <div class="flow-num">2</div>
+            <h3>AI cuts it out</h3>
+            <p>A model running locally in your browser removes the background — nothing is uploaded.</p>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-card">
+            <div class="flow-num">3</div>
+            <h3>Download the PNG</h3>
+            <p>Get a full-resolution, transparent PNG — no watermark, no account required.</p>
           </div>
         </div>
       </div>
 
-      <div class="upload-section">
-        <div id="dropzone">
-          <div class="dropzone-icon">✂️</div>
-          <h3>Drop your images here</h3>
-          <p>or paste from clipboard <kbd>Ctrl+V</kbd> · or browse below</p>
-          <label for="fileInput" class="btn-upload">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
+      <div class="upload-anchor" id="upload">
+        <div class="upload-heading">
+          <h2>Try it on your own photo</h2>
+          <p>Nothing here ever leaves your device.</p>
+        </div>
+
+        <div id="model-banner">
+          <div class="model-banner-inner">
+            <div
+              class="spinner"
+              style="width: 16px; height: 16px; border-width: 2px; flex-shrink: 0"
+            ></div>
+            <div style="flex: 1">
+              <div id="model-banner-text">
+                Loading AI model for the first time — this takes ~10 seconds…
+              </div>
+              <div class="progress-outer" style="margin-top: 6px">
+                <div class="progress-inner" id="model-progress-inner"></div>
+              </div>
+            </div>
+            <div
+              id="model-banner-pct"
+              style="
+                font-size: 12px;
+                color: var(--purple);
+                font-weight: 600;
+                min-width: 36px;
+                text-align: right;
+              "
             >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            Choose Images
-          </label>
-          <input
-            type="file"
-            id="fileInput"
-            accept="image/jpeg,image/png,image/webp"
-            multiple
-          />
-          <p class="format-note">
-            JPG, PNG, WebP · up to 15MB each · up to 20 files at a time
-          </p>
-          <p class="format-note" style="margin-top: 6px">
-            🔒 Processed locally in your browser — your images are never
-            uploaded anywhere.
-          </p>
+              0%
+            </div>
+          </div>
         </div>
 
-        <div id="status-bar">
-          <div class="spinner" id="status-spinner"></div>
-          <div class="progress-outer">
-            <div class="progress-inner" id="progress-inner"></div>
+        <div class="upload-section">
+          <div id="dropzone">
+            <div class="dropzone-icon">
+              <img src="/assets/logo.png" alt="CutOutFree" />
+            </div>
+            <h3>Drop your images here</h3>
+            <p>or paste from clipboard <kbd>Ctrl+V</kbd> · or browse below</p>
+            <label for="fileInput" class="btn-grad">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              Choose Images
+            </label>
+            <input
+              type="file"
+              id="fileInput"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+            />
+            <p class="format-note">
+              JPG, PNG, WebP · up to 15MB each · up to 20 files at a time
+            </p>
+            <p class="format-note" style="margin-top: 6px">
+              🔒 Processed locally in your browser — your images are never
+              uploaded anywhere.
+            </p>
           </div>
-          <div id="status-text">Processing…</div>
+
+          <div id="status-bar">
+            <div class="spinner" id="status-spinner"></div>
+            <div class="progress-outer">
+              <div class="progress-inner" id="progress-inner"></div>
+            </div>
+            <div id="status-text">Processing…</div>
+          </div>
+        </div>
+
+        <div id="results">
+          <div class="results-header">
+            <h2 id="results-title">Results</h2>
+            <div class="results-actions">
+              <button class="btn-ghost" id="clear-btn">Clear all</button>
+              <button class="btn-accent" id="dl-all-btn">Download all</button>
+            </div>
+          </div>
+          <div class="image-grid" id="image-grid"></div>
         </div>
       </div>
 
-      <div id="results">
-        <div class="results-header">
-          <h2 id="results-title">Results</h2>
-          <div class="results-actions">
-            <button class="btn-ghost" id="clear-btn">Clear all</button>
-            <button class="btn-accent" id="dl-all-btn">Download all</button>
-          </div>
+      <div class="bento">
+        <div class="bento-tile light">
+          <h3>100% local processing</h3>
+          <p>Your photos are never uploaded — the AI model runs on your device.</p>
         </div>
-        <div class="image-grid" id="image-grid"></div>
-      </div>
-
-      <div class="features">
-        <div class="feature-card">
-          <div class="feature-icon">🔒</div>
-          <h4>100% Private</h4>
-          <p>
-            The AI model runs inside your browser. Your photos never touch a
-            server — not ours, not anyone's.
-          </p>
+        <div class="bento-tile dark">
+          <div class="num grad-text">$0</div>
+          <div class="label">Cost, forever — no plans, no credits</div>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon">⚡</div>
-          <h4>Full Resolution</h4>
-          <p>
-            Download crisp, full-size PNGs every time. No HD paywall, no
-            watermarks, no credits to buy.
-          </p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">📦</div>
-          <h4>Bulk Processing</h4>
-          <p>
-            Drop 20 product photos at once. Every e-commerce seller's dream —
-            and it's completely free.
-          </p>
+        <div class="bento-tile dark">
+          <div class="num grad-text">&lt;2s</div>
+          <div class="label">Average time per image</div>
         </div>
       </div>
 
       <footer>
         <span
-          >© 2026 CutOut — Free forever, always local ·
+          >© 2026 CutOutFree — Free forever, always local ·
           <a
             href="/privacy.html"
             style="color: inherit; text-decoration: underline"
