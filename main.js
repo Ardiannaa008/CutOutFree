@@ -1,5 +1,8 @@
 import { removeBackground as imglyRemoveBackground } from "@imgly/background-removal";
 import { inject, track } from "@vercel/analytics";
+import { initEditor, openEditor } from "./editor.js";
+
+initEditor();
 
 // Initialize Analytics
 inject();
@@ -209,7 +212,10 @@ function processFile(file) {
         <div class="card-name">${file.name}</div>
         <div class="card-size">${formatSize(file.size)}</div>
       </div>
-      <button class="btn-dl" id="dl-${id}" disabled>Download</button>
+      <div class="card-actions">
+        <button class="btn-edit" id="edit-${id}" disabled>Edit</button>
+        <button class="btn-dl" id="dl-${id}" disabled>Download</button>
+      </div>
     </div>
   `;
   imageGrid.prepend(card);
@@ -222,7 +228,7 @@ function processFile(file) {
   };
   reader.readAsDataURL(file);
 
-  jobs.set(id, { status: "processing", blob: null });
+  jobs.set(id, { status: "processing", blob: null, file });
 
   return imglyRemoveBackground(file, {
     progress: (key, current, total) => {
@@ -247,16 +253,27 @@ function processFile(file) {
       const overlay = document.getElementById(`overlay-${id}`);
       if (overlay) overlay.classList.add("done");
 
+      const outName = file.name.replace(/\.[^.]+$/, "") + "_cutout.png";
       const dlBtn = document.getElementById(`dl-${id}`);
       if (dlBtn) {
         dlBtn.disabled = false;
-        const outName = file.name.replace(/\.[^.]+$/, "") + "_cutout.png";
-        dlBtn.onclick = () => triggerDownload(url, outName);
+        dlBtn.onclick = () => {
+          const job = jobs.get(id);
+          triggerDownload(job.url, outName);
+        };
+      }
+
+      const editBtn = document.getElementById(`edit-${id}`);
+      if (editBtn) {
+        editBtn.disabled = false;
+        editBtn.onclick = () => openImageEditor(id);
       }
 
       jobs.set(id, {
         status: "done",
         url,
+        blob,
+        file,
         name: file.name.replace(/\.[^.]+$/, ""),
       });
       activeBatchDone++;
@@ -274,6 +291,40 @@ function processFile(file) {
       console.error("Processing error:", err);
       handleError(id, "Processing failed. Try a different image.");
     });
+}
+
+// ─── Touch-up editor bridge ───────────────────────────────────────────────────
+function openImageEditor(id) {
+  const job = jobs.get(id);
+  if (!job || job.status !== "done") return;
+
+  if (!job.originalUrl) job.originalUrl = URL.createObjectURL(job.file);
+
+  openEditor(
+    { cutoutUrl: job.url, originalUrl: job.originalUrl, name: job.name },
+    (editedBlob) => {
+      // Swap the old object URL for the newly edited result everywhere it's used.
+      const oldUrl = job.url;
+      const newUrl = URL.createObjectURL(editedBlob);
+
+      const img = document.getElementById(`orig-${id}`);
+      if (img) img.src = newUrl;
+
+      const dlBtn = document.getElementById(`dl-${id}`);
+      if (dlBtn) {
+        const outName = job.name + "_cutout.png";
+        dlBtn.onclick = () => triggerDownload(jobs.get(id).url, outName);
+      }
+
+      job.url = newUrl;
+      job.blob = editedBlob;
+      jobs.set(id, job);
+
+      URL.revokeObjectURL(oldUrl);
+      track("Image Edited");
+      showToast("✓ Edits applied");
+    },
+  );
 }
 
 // ─── Error handler ────────────────────────────────────────────────────────────
@@ -335,6 +386,7 @@ function downloadAll() {
 function clearAll() {
   for (const [, job] of jobs) {
     if (job.url) URL.revokeObjectURL(job.url);
+    if (job.originalUrl) URL.revokeObjectURL(job.originalUrl);
   }
   jobs.clear();
   imageGrid.innerHTML = "";

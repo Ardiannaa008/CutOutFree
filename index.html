@@ -1019,7 +1019,14 @@
         margin-top: 2px;
       }
 
-      .btn-dl {
+      .card-actions {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+
+      .btn-dl,
+      .btn-edit {
         padding: 6px 14px;
         border-radius: 100px;
         border: 1px solid rgba(178, 107, 251, 0.35);
@@ -1033,13 +1040,24 @@
         white-space: nowrap;
         flex-shrink: 0;
       }
-      .btn-dl:hover:not(:disabled) {
+      .btn-dl:hover:not(:disabled),
+      .btn-edit:hover:not(:disabled) {
         background: rgba(178, 107, 251, 0.2);
         border-color: var(--purple);
       }
-      .btn-dl:disabled {
+      .btn-dl:disabled,
+      .btn-edit:disabled {
         opacity: 0.4;
         cursor: not-allowed;
+      }
+      .btn-edit {
+        border-color: rgba(109, 125, 253, 0.35);
+        background: rgba(109, 125, 253, 0.08);
+        color: var(--blue);
+      }
+      .btn-edit:hover:not(:disabled) {
+        background: rgba(109, 125, 253, 0.2);
+        border-color: var(--blue);
       }
 
       /* ─── bottom stat bento ──────────────────────────────────────────── */
@@ -1455,6 +1473,7 @@
     </div>
 
     <div id="toast"></div>
+    <div id="editor-root"></div>
 
     <script type="module" src="./main.js"></script>
   </body>
