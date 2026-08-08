@@ -122,6 +122,13 @@ function injectStyles() {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='6' height='6' fill='%23bbb'/%3E%3Crect x='6' y='0' width='6' height='6' fill='%23888'/%3E%3Crect x='0' y='6' width='6' height='6' fill='%23888'/%3E%3Crect x='6' y='6' width='6' height='6' fill='%23bbb'/%3E%3C/svg%3E");
       background-size: 10px 10px;
     }
+    .ed-swatch.ed-swatch-label {
+      width: auto; min-width: 58px; padding: 0 8px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--glass-strong); color: var(--muted);
+      font-size: 10.5px; font-weight: 600; white-space: nowrap;
+    }
+    .ed-swatch.ed-swatch-label.active { color: var(--text); }
     .ed-swatch-color { -webkit-appearance: none; appearance: none; padding: 0; background: conic-gradient(red,yellow,lime,cyan,blue,magenta,red); }
     .ed-swatch-color::-webkit-color-swatch-wrapper { padding: 0; }
     .ed-swatch-color::-webkit-color-swatch { border: none; border-radius: 6px; }
@@ -213,6 +220,9 @@ function buildMarkup() {
                 <button class="ed-mode-btn active" data-mode="erase">🧽 Erase</button>
                 <button class="ed-mode-btn" data-mode="restore">🖌 Restore</button>
               </div>
+              <div class="ed-btn-row" style="margin:10px 0 12px">
+                <button class="ed-icon-btn" id="ed-clean-edges">✨ Clean edges</button>
+              </div>
               <div class="ed-slider-row">
                 <div class="ed-slider-label"><span>Brush size</span><span id="ed-size-val">40px</span></div>
                 <input type="range" class="ed-range" id="ed-size" min="4" max="200" value="40" />
@@ -244,10 +254,33 @@ function buildMarkup() {
                 <div class="ed-swatch" data-bg="#6d7dfd" style="background:#6d7dfd" title="Blue"></div>
                 <div class="ed-swatch" data-bg="#b26bfb" style="background:#b26bfb" title="Purple"></div>
                 <div class="ed-swatch" data-bg="#3ddc97" style="background:#3ddc97" title="Green"></div>
+                <div class="ed-swatch ed-swatch-label" data-bg="blur" title="Blur original background">Blur bg</div>
                 <input type="color" class="ed-swatch ed-swatch-color" id="ed-color-picker" title="Custom color" value="#fb6bb0" />
+              </div>
+              <div class="ed-slider-row" id="ed-blur-row" style="display:none;margin-top:10px">
+                <div class="ed-slider-label"><span>Blur amount</span><span id="ed-blur-val">12px</span></div>
+                <input type="range" class="ed-range" id="ed-blur" min="2" max="30" value="12" />
               </div>
               <input type="file" id="ed-bg-file" accept="image/png,image/jpeg,image/webp" style="display:none" />
               <button class="ed-bg-upload" id="ed-bg-upload-btn">Upload background photo…</button>
+            </div>
+            <div class="ed-tool-group">
+              <div class="ed-group-label">Outline</div>
+              <div class="ed-toggle-row" style="margin-bottom:10px">
+                <span>Add outline</span>
+                <input type="checkbox" id="ed-outline-toggle" />
+              </div>
+              <div class="ed-bg-swatches" id="ed-outline-swatches">
+                <div class="ed-swatch active" data-outline="#ffffff" style="background:#ffffff" title="White"></div>
+                <div class="ed-swatch" data-outline="#0a0c14" style="background:#0a0c14" title="Black"></div>
+                <div class="ed-swatch" data-outline="#6d7dfd" style="background:#6d7dfd" title="Blue"></div>
+                <div class="ed-swatch" data-outline="#fb6bb0" style="background:#fb6bb0" title="Pink"></div>
+                <div class="ed-swatch" data-outline="#3ddc97" style="background:#3ddc97" title="Green"></div>
+              </div>
+              <div class="ed-slider-row" style="margin-top:10px;margin-bottom:0">
+                <div class="ed-slider-label"><span>Width</span><span id="ed-outline-width-val">8px</span></div>
+                <input type="range" class="ed-range" id="ed-outline-width" min="2" max="30" value="8" />
+              </div>
             </div>
             <div class="ed-tool-group">
               <div class="ed-group-label">History</div>
@@ -291,6 +324,7 @@ function cacheEls() {
     sizeVal: g("ed-size-val"),
     feather: g("ed-feather"),
     featherVal: g("ed-feather-val"),
+    cleanEdges: g("ed-clean-edges"),
     overlayToggle: g("ed-overlay-toggle"),
     zoomOut: g("ed-zoom-out"),
     zoomIn: g("ed-zoom-in"),
@@ -298,8 +332,15 @@ function cacheEls() {
     zoomPct: g("ed-zoom-pct"),
     bgSwatches: g("ed-bg-swatches"),
     colorPicker: g("ed-color-picker"),
+    blurRow: g("ed-blur-row"),
+    blur: g("ed-blur"),
+    blurVal: g("ed-blur-val"),
     bgFile: g("ed-bg-file"),
     bgUploadBtn: g("ed-bg-upload-btn"),
+    outlineToggle: g("ed-outline-toggle"),
+    outlineSwatches: g("ed-outline-swatches"),
+    outlineWidth: g("ed-outline-width"),
+    outlineWidthVal: g("ed-outline-width-val"),
     undo: g("ed-undo"),
     redo: g("ed-redo"),
     canvasArea: g("ed-canvas-area"),
@@ -382,7 +423,14 @@ async function loadJob(job) {
     mode: "erase",
     brushSize: 40,
     feather: 40,
-    background: "transparent", // 'transparent' | '#hex' | HTMLImageElement
+    background: { type: "transparent" },
+    outline: {
+      enabled: false,
+      color: "#ffffff",
+      width: 8,
+      maskCanvas: null,
+      dirty: true,
+    },
     showOverlay: false,
     zoom: 1,
     tx: 0, ty: 0,
@@ -405,8 +453,13 @@ async function loadJob(job) {
   setMode("erase");
   els.size.value = 40; els.sizeVal.textContent = "40px";
   els.feather.value = 40; els.featherVal.textContent = "40%";
-  root.querySelectorAll(".ed-swatch").forEach((s) => s.classList.remove("active"));
+  els.blur.value = 12; els.blurVal.textContent = "12px"; els.blurRow.style.display = "none";
+  els.outlineToggle.checked = false;
+  els.outlineWidth.value = 8; els.outlineWidthVal.textContent = "8px";
+  els.bgSwatches.querySelectorAll(".ed-swatch").forEach((s) => s.classList.remove("active"));
   root.querySelector('.ed-swatch[data-bg="transparent"]').classList.add("active");
+  els.outlineSwatches.querySelectorAll(".ed-swatch").forEach((s) => s.classList.remove("active"));
+  els.outlineSwatches.querySelector('.ed-swatch[data-outline="#ffffff"]').classList.add("active");
   updateUndoRedoButtons();
   fitToView();
   render();
@@ -424,10 +477,18 @@ function loadImage(src) {
 
 // ─── Rendering ────────────────────────────────────────────────────────────
 function render() {
-  const { originalCanvas, maskCanvas, scratchCanvas, w, h, background } = state;
+  const { w, h } = state;
   const ctx = els.displayCanvas.getContext("2d");
 
-  // masked-original layer: original AND mask-alpha, via destination-in
+  buildScratchCanvas();
+  ctx.clearRect(0, 0, w, h);
+  drawComposite(ctx);
+
+  els.overlayImg.classList.toggle("on", state.showOverlay);
+}
+
+function buildScratchCanvas() {
+  const { originalCanvas, maskCanvas, scratchCanvas, w, h } = state;
   const sctx = scratchCanvas.getContext("2d");
   sctx.clearRect(0, 0, w, h);
   sctx.globalCompositeOperation = "source-over";
@@ -435,19 +496,67 @@ function render() {
   sctx.globalCompositeOperation = "destination-in";
   sctx.drawImage(maskCanvas, 0, 0);
   sctx.globalCompositeOperation = "source-over";
+}
 
-  ctx.clearRect(0, 0, w, h);
-  if (background === "transparent") {
-    // checkerboard shows through via the CSS background of .ed-canvas-area
-  } else if (typeof background === "string") {
-    ctx.fillStyle = background;
-    ctx.fillRect(0, 0, w, h);
-  } else if (background instanceof HTMLImageElement) {
-    drawCover(ctx, background, w, h);
+function drawComposite(ctx) {
+  drawBackground(ctx);
+  drawOutline(ctx);
+  ctx.drawImage(state.scratchCanvas, 0, 0);
+}
+
+function drawBackground(ctx) {
+  const { background, w, h } = state;
+  if (background.type === "transparent") {
+    return;
   }
-  ctx.drawImage(scratchCanvas, 0, 0);
+  if (background.type === "color") {
+    ctx.fillStyle = background.value;
+    ctx.fillRect(0, 0, w, h);
+    return;
+  }
+  if (background.type === "image") {
+    drawCover(ctx, background.img, w, h);
+    return;
+  }
+  if (background.type === "blur") {
+    const amount = background.amount;
+    const pad = Math.ceil(amount * 2);
+    ctx.save();
+    ctx.filter = `blur(${amount}px)`;
+    ctx.drawImage(state.originalCanvas, -pad, -pad, w + pad * 2, h + pad * 2);
+    ctx.restore();
+  }
+}
 
-  els.overlayImg.classList.toggle("on", state.showOverlay);
+function drawOutline(ctx) {
+  const { outline, w, h } = state;
+  if (!outline.enabled) return;
+  const outlineMask = getOutlineMask();
+  const outlineCanvas = document.createElement("canvas");
+  outlineCanvas.width = w;
+  outlineCanvas.height = h;
+  const octx = outlineCanvas.getContext("2d");
+  octx.fillStyle = outline.color;
+  octx.fillRect(0, 0, w, h);
+  octx.globalCompositeOperation = "destination-in";
+  octx.drawImage(outlineMask, 0, 0);
+  octx.globalCompositeOperation = "source-over";
+  ctx.drawImage(outlineCanvas, 0, 0);
+}
+
+function getOutlineMask() {
+  const { outline, maskCanvas } = state;
+  if (!outline.maskCanvas || outline.dirty) {
+    outline.maskCanvas = snapshotMask(maskCanvas);
+    dilateAlpha(outline.maskCanvas, outline.width);
+    outline.dirty = false;
+  }
+  return outline.maskCanvas;
+}
+
+function invalidateOutlineMask() {
+  if (!state?.outline) return;
+  state.outline.dirty = true;
 }
 
 function drawCover(ctx, img, w, h) {
@@ -466,6 +575,73 @@ function drawCover(ctx, img, w, h) {
     sy = (img.naturalHeight - sh) / 2;
   }
   ctx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
+}
+
+function erodeAlpha(maskCanvas, radiusPx) {
+  return morphAlpha(maskCanvas, radiusPx, "erode");
+}
+
+function dilateAlpha(maskCanvas, radiusPx) {
+  return morphAlpha(maskCanvas, radiusPx, "dilate");
+}
+
+function morphAlpha(maskCanvas, radiusPx, mode) {
+  const radius = Math.max(0, Math.round(radiusPx));
+  if (radius === 0) return maskCanvas;
+
+  const w = maskCanvas.width;
+  const h = maskCanvas.height;
+  const work = document.createElement("canvas");
+  work.width = w;
+  work.height = h;
+  const ctx = work.getContext("2d");
+  ctx.drawImage(maskCanvas, 0, 0);
+
+  const img = ctx.getImageData(0, 0, w, h);
+  const data = img.data;
+  const srcAlpha = new Uint8ClampedArray(w * h);
+  const passAlpha = new Uint8ClampedArray(w * h);
+  const outAlpha = new Uint8ClampedArray(w * h);
+  const pickInitial = mode === "erode" ? 255 : 0;
+
+  for (let i = 0, p = 0; i < data.length; i += 4, p++) {
+    srcAlpha[p] = data[i + 3];
+  }
+
+  for (let y = 0; y < h; y++) {
+    const row = y * w;
+    for (let x = 0; x < w; x++) {
+      let picked = pickInitial;
+      const from = Math.max(0, x - radius);
+      const to = Math.min(w - 1, x + radius);
+      for (let xx = from; xx <= to; xx++) {
+        const alpha = srcAlpha[row + xx];
+        picked = mode === "erode" ? Math.min(picked, alpha) : Math.max(picked, alpha);
+      }
+      passAlpha[row + x] = picked;
+    }
+  }
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let picked = pickInitial;
+      const from = Math.max(0, y - radius);
+      const to = Math.min(h - 1, y + radius);
+      for (let yy = from; yy <= to; yy++) {
+        const alpha = passAlpha[yy * w + x];
+        picked = mode === "erode" ? Math.min(picked, alpha) : Math.max(picked, alpha);
+      }
+      outAlpha[y * w + x] = picked;
+    }
+  }
+
+  const outCtx = maskCanvas.getContext("2d");
+  const out = outCtx.getImageData(0, 0, w, h);
+  for (let i = 0, p = 0; i < out.data.length; i += 4, p++) {
+    out.data[i + 3] = outAlpha[p];
+  }
+  outCtx.putImageData(out, 0, 0);
+  return maskCanvas;
 }
 
 // ─── Brush painting ───────────────────────────────────────────────────────
@@ -559,6 +735,7 @@ function pushHistory() {
   state.history.push(snapshotMask(state.maskCanvas));
   if (state.history.length > HISTORY_LIMIT) state.history.shift();
   state.historyIndex = state.history.length - 1;
+  invalidateOutlineMask();
   updateUndoRedoButtons();
 }
 
@@ -568,6 +745,7 @@ function restoreHistory(index) {
   ctx.clearRect(0, 0, state.w, state.h);
   ctx.drawImage(snap, 0, 0);
   state.historyIndex = index;
+  invalidateOutlineMask();
   updateUndoRedoButtons();
   render();
 }
@@ -618,6 +796,17 @@ function wireStaticEvents() {
     state.feather = Number(els.feather.value);
     els.featherVal.textContent = state.feather + "%";
   });
+  els.cleanEdges.addEventListener("click", () => {
+    if (!state) return;
+    const radius = 2;
+    erodeAlpha(state.maskCanvas, radius);
+    dilateAlpha(state.maskCanvas, radius);
+    dilateAlpha(state.maskCanvas, radius);
+    erodeAlpha(state.maskCanvas, radius);
+    invalidateOutlineMask();
+    pushHistory();
+    render();
+  });
 
   els.overlayToggle.addEventListener("change", () => {
     state.showOverlay = els.overlayToggle.checked;
@@ -649,15 +838,52 @@ function wireStaticEvents() {
   els.bgSwatches.addEventListener("click", (e) => {
     const swatch = e.target.closest(".ed-swatch");
     if (!swatch || swatch.id === "ed-color-picker") return;
-    root.querySelectorAll(".ed-swatch").forEach((s) => s.classList.remove("active"));
+    els.bgSwatches.querySelectorAll(".ed-swatch").forEach((s) => s.classList.remove("active"));
     swatch.classList.add("active");
-    state.background = swatch.dataset.bg === "transparent" ? "transparent" : swatch.dataset.bg;
+    if (swatch.dataset.bg === "transparent") {
+      state.background = { type: "transparent" };
+      els.blurRow.style.display = "none";
+    } else if (swatch.dataset.bg === "blur") {
+      state.background = { type: "blur", amount: Number(els.blur.value) };
+      els.blurRow.style.display = "";
+    } else {
+      state.background = { type: "color", value: swatch.dataset.bg };
+      els.blurRow.style.display = "none";
+    }
     render();
   });
   els.colorPicker.addEventListener("input", () => {
-    root.querySelectorAll(".ed-swatch").forEach((s) => s.classList.remove("active"));
+    els.bgSwatches.querySelectorAll(".ed-swatch").forEach((s) => s.classList.remove("active"));
     els.colorPicker.classList.add("active");
-    state.background = els.colorPicker.value;
+    els.blurRow.style.display = "none";
+    state.background = { type: "color", value: els.colorPicker.value };
+    render();
+  });
+  els.blur.addEventListener("input", () => {
+    const amount = Number(els.blur.value);
+    els.blurVal.textContent = amount + "px";
+    if (state.background.type === "blur") {
+      state.background = { type: "blur", amount };
+      render();
+    }
+  });
+  els.outlineToggle.addEventListener("change", () => {
+    state.outline.enabled = els.outlineToggle.checked;
+    if (state.outline.enabled) invalidateOutlineMask();
+    render();
+  });
+  els.outlineSwatches.addEventListener("click", (e) => {
+    const swatch = e.target.closest(".ed-swatch");
+    if (!swatch) return;
+    els.outlineSwatches.querySelectorAll(".ed-swatch").forEach((s) => s.classList.remove("active"));
+    swatch.classList.add("active");
+    state.outline.color = swatch.dataset.outline;
+    render();
+  });
+  els.outlineWidth.addEventListener("input", () => {
+    state.outline.width = Number(els.outlineWidth.value);
+    els.outlineWidthVal.textContent = state.outline.width + "px";
+    invalidateOutlineMask();
     render();
   });
   els.bgUploadBtn.addEventListener("click", () => els.bgFile.click());
@@ -667,8 +893,9 @@ function wireStaticEvents() {
     if (state.bgObjectUrl) URL.revokeObjectURL(state.bgObjectUrl);
     state.bgObjectUrl = URL.createObjectURL(file);
     const img = await loadImage(state.bgObjectUrl);
-    state.background = img;
-    root.querySelectorAll(".ed-swatch").forEach((s) => s.classList.remove("active"));
+    state.background = { type: "image", img };
+    els.bgSwatches.querySelectorAll(".ed-swatch").forEach((s) => s.classList.remove("active"));
+    els.blurRow.style.display = "none";
     render();
     els.bgFile.value = "";
   });
@@ -682,6 +909,7 @@ function wireStaticEvents() {
     ctx.clearRect(0, 0, state.w, state.h);
     loadImage(state.job.cutoutUrl).then((img) => {
       ctx.drawImage(img, 0, 0, state.w, state.h);
+      invalidateOutlineMask();
       pushHistory();
       render();
     });
@@ -689,19 +917,12 @@ function wireStaticEvents() {
 
   els.apply.addEventListener("click", async () => {
     if (!state) return;
+    buildScratchCanvas();
     const outCanvas = document.createElement("canvas");
     outCanvas.width = state.w;
     outCanvas.height = state.h;
     const octx = outCanvas.getContext("2d");
-    if (state.background === "transparent") {
-      // leave transparent
-    } else if (typeof state.background === "string") {
-      octx.fillStyle = state.background;
-      octx.fillRect(0, 0, state.w, state.h);
-    } else if (state.background instanceof HTMLImageElement) {
-      drawCover(octx, state.background, state.w, state.h);
-    }
-    octx.drawImage(state.scratchCanvas, 0, 0);
+    drawComposite(octx);
     outCanvas.toBlob((blob) => {
       if (blob && state.onApply) state.onApply(blob);
       closeEditor();
@@ -737,6 +958,7 @@ function wireStaticEvents() {
     if (e.key === "Escape") closeEditor();
   });
   window.addEventListener("keyup", (e) => {
+    if (!state) return;
     if (e.code === "Space") { state.spaceHeld = false; els.canvasArea.style.cursor = "crosshair"; }
   });
 
@@ -821,9 +1043,11 @@ function onPointerMove(e) {
 function onPointerUp(e) {
   if (!state) return;
   state.activePointers.delete(e.pointerId);
-  if (state.isDrawing) pushHistory();
+  const finishedDrawing = state.isDrawing;
+  if (finishedDrawing) pushHistory();
   state.isDrawing = false;
   state.isPanning = false;
   state.pinchStartDist = 0;
   els.canvasArea.style.cursor = state.spaceHeld ? "grab" : "crosshair";
+  if (finishedDrawing) render();
 }

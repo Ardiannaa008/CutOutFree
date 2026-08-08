@@ -1,0 +1,104 @@
+Add three features to the CutOutFree editor in editor.js. Read the existing 
+render(), loadJob(), and state object first — all three features build on 
+the existing maskCanvas/originalCanvas/scratchCanvas compositing pipeline, 
+don't replace it.
+
+## 0. Shared prerequisite: a morphology helper
+
+Features 1 and 3 both need erode/dilate operations on the mask's alpha 
+channel. Write this once as a shared utility and use it in both places:
+
+- `erodeAlpha(maskCanvas, radiusPx)` — for each pixel, alpha becomes the 
+  MIN alpha value within a radiusPx disk/square neighborhood. Shrinks the 
+  opaque region, kills small stray specks.
+- `dilateAlpha(maskCanvas, radiusPx)` — same but MAX instead of MIN. Grows 
+  the opaque region, fills small holes/gaps.
+- Implement via getImageData/putImageData on a small offscreen canvas 
+  sized to the mask (native mask resolution, which is already capped at 
+  MAX_EDIT_DIMENSION), operating only on the alpha channel (index i+3 of 
+  the Uint8ClampedArray). A simple two-pass separable box filter (horizontal 
+  pass then vertical pass) is fine for performance — no need for a true 
+  circular kernel.
+- These run once on button click, not per-frame, so a straightforward pixel 
+  loop is fine performance-wise (radiusPx will realistically be 1-15px).
+
+## 1. One-click "Clean edges" button
+
+Add a button in the toolbar (put it near the Brush section, label "✨ Clean 
+edges"). On click:
+- Run an OPEN operation on maskCanvas (erode then dilate) with a small fixed 
+  radius (start with 2px) to kill stray isolated pixels/specks left by the 
+  AI cutout.
+- Then run a CLOSE operation (dilate then erode) with the same radius to 
+  fill small pinhole gaps inside the subject.
+- Call pushHistory() after, same as after a brush stroke, so it's undoable 
+  with the existing undo/redo system.
+- Call render() to reflect it immediately.
+- This is a single click, no slider, no preview toggle — just clean it and 
+  let Undo be the escape hatch if someone doesn't like the result.
+
+## 2. Background blur mode ("portrait mode" effect)
+
+Currently `state.background` is either the string `"transparent"`, a hex 
+color string, or an HTMLImageElement (see render() and the Apply handler). 
+Refactor it to a small tagged object so a blur mode fits cleanly:
+  `state.background = { type: 'transparent' }`
+  `state.background = { type: 'color', value: '#hex' }`
+  `state.background = { type: 'image', img: HTMLImageElement }`
+  `state.background = { type: 'blur', amount: 12 }`  // amount in px
+
+Update every place that reads state.background (render(), the Apply/export 
+handler, the swatch click handlers, the color picker handler, the bg-file 
+upload handler) to use the new tagged shape instead of typeof/instanceof 
+checks.
+
+For the new blur type:
+- Add one more swatch in the Background section: a small icon/label 
+  "Blur bg" (distinct from the existing color swatches — e.g. a half-tone 
+  or blur icon, doesn't need to be a color square).
+- When selected, reveal a "Blur amount" slider (range ~2-30px, default 12) 
+  right below the swatch row, same slider style as brush size/softness.
+- Rendering: draw state.originalCanvas onto the background layer with 
+  `ctx.filter = \`blur(${amount}px)\`` before drawing it (native canvas 
+  filter — fast, no manual convolution needed), then draw the masked 
+  subject (scratchCanvas) on top as usual. Apply the same filter approach 
+  in the final Apply/export composite so exported result matches the 
+  live preview exactly.
+- Make sure ctx.filter is reset to 'none' after drawing the blurred 
+  background so it doesn't leak onto the sharp subject layer drawn next.
+
+## 3. Sticker/outline border
+
+Add a "Add outline" toggle + a color swatch row (reuse the same swatch 
+component/markup pattern as Background) + a width slider (range 2-30px, 
+default 8) in a new toolbar section labeled "Outline" or "Sticker border".
+
+Rendering, in this order (background, then outline, then subject):
+- If outline is enabled: take maskCanvas, run it through dilateAlpha() at 
+  the chosen width to get an expanded silhouette shape, draw that expanded 
+  shape filled entirely with the chosen outline color (use the dilated 
+  alpha as a mask via the same destination-in compositing trick already 
+  used for scratchCanvas — draw a solid rect of the outline color, then 
+  destination-in against the dilated mask) onto the display canvas AFTER 
+  the background but BEFORE drawing scratchCanvas (the subject). This makes 
+  a solid colored border peek out from behind the subject's edges, exactly 
+  like Instagram/social sticker borders.
+- Recompute the dilated mask only when the width slider changes or outline 
+  is toggled on (cache it), not on every render() call, since dilateAlpha 
+  is a pixel loop — don't run it on every brush stroke's render.
+- Include the outline in the final Apply/export composite in the same order.
+
+## General requirements for all three
+- Each should push to the existing undo/redo history where it mutates the 
+  mask (Clean edges, and re-caching the dilated outline mask if you store 
+  it as part of undoable state — use your judgement, but Clean edges 
+  definitely needs pushHistory()).
+- Reuse existing toolbar CSS classes (.ed-group-label, .ed-slider-row, 
+  .ed-range, .ed-btn-row, .ed-icon-btn, .ed-swatch) for visual consistency 
+  with the button-system redesign already in place — don't introduce new 
+  button styles.
+- Test: load an image, click Clean edges and confirm stray pixels disappear 
+  and it's undoable. Switch to blur background and confirm the slider 
+  updates live. Enable outline, change width and color, confirm it renders 
+  behind the subject correctly. Apply changes and confirm the exported PNG 
+  matches what was shown in the live preview for all three.
