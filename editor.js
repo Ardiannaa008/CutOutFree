@@ -56,7 +56,7 @@ function injectStyles() {
     }
     .ed-header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      padding: 18px 22px; border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
     .ed-title { font-size: 14px; font-weight: 600; color: var(--text); }
@@ -69,20 +69,28 @@ function injectStyles() {
 
     .ed-body { flex: 1; display: flex; min-height: 0; }
     .ed-toolbar {
-      width: 232px; flex-shrink: 0; padding: 16px; overflow-y: auto;
+      width: 244px; flex-shrink: 0; padding: 18px; overflow-y: auto;
       border-right: 1px solid var(--border);
-      display: flex; flex-direction: column; gap: 18px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .ed-tool-group {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--glass);
     }
     .ed-group-label {
       font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--muted-dim); font-weight: 600; margin-bottom: 8px;
+      color: var(--muted-dim); font-weight: 600; margin-bottom: 10px;
     }
-    .ed-mode-row { display: flex; gap: 6px; }
+    .ed-mode-row { display: flex; gap: 8px; }
     .ed-mode-btn {
-      flex: 1; padding: 8px 6px; border-radius: 10px; border: 1px solid var(--border);
-      background: var(--glass); color: var(--muted); font-size: 12px; font-weight: 500;
+      flex: 1; min-height: 34px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); font-size: 12px; font-weight: 500;
       cursor: pointer; font-family: inherit; transition: all .15s;
+      white-space: nowrap;
     }
+    .ed-mode-btn:hover:not(.active) { color: var(--text); background: var(--glass); border-color: rgba(255,255,255,0.22); }
     .ed-mode-btn.active[data-mode="erase"] {
       background: rgba(255,107,107,0.14); border-color: var(--danger); color: var(--danger);
     }
@@ -106,7 +114,7 @@ function injectStyles() {
 
     .ed-bg-swatches { display: flex; flex-wrap: wrap; gap: 8px; }
     .ed-swatch {
-      width: 30px; height: 30px; border-radius: 8px; cursor: pointer;
+      width: 32px; height: 32px; border-radius: 8px; cursor: pointer;
       border: 2px solid var(--border); position: relative; flex-shrink: 0;
     }
     .ed-swatch.active { border-color: var(--purple); box-shadow: 0 0 0 2px rgba(178,107,251,0.35); }
@@ -118,21 +126,22 @@ function injectStyles() {
     .ed-swatch-color::-webkit-color-swatch-wrapper { padding: 0; }
     .ed-swatch-color::-webkit-color-swatch { border: none; border-radius: 6px; }
     .ed-bg-upload {
-      width: 100%; margin-top: 8px; padding: 8px; border-radius: 10px;
+      width: 100%; margin-top: 10px; padding: 9px 10px; border-radius: 10px;
       border: 1px dashed var(--border); background: var(--glass); color: var(--muted);
       font-size: 11.5px; cursor: pointer; font-family: inherit; text-align: center;
     }
     .ed-bg-upload:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
 
-    .ed-btn-row { display: flex; gap: 6px; }
+    .ed-btn-row { display: flex; gap: 8px; }
     .ed-icon-btn {
-      flex: 1; padding: 7px; border-radius: 8px; border: 1px solid var(--border);
-      background: var(--glass); color: var(--muted); cursor: pointer; font-size: 12px;
+      flex: 1; min-height: 30px; padding: 6px 9px; border-radius: 7px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); cursor: pointer; font-size: 11.5px;
       font-family: inherit; transition: all .15s;
+      white-space: nowrap;
     }
-    .ed-icon-btn:hover:not(:disabled) { color: var(--text); border-color: rgba(255,255,255,0.25); }
+    .ed-icon-btn:hover:not(:disabled) { color: var(--text); background: var(--glass); border-color: rgba(255,255,255,0.22); }
+    .ed-icon-btn:active:not(:disabled) { color: var(--text); background: var(--glass-strong); border-color: rgba(255,255,255,0.3); }
     .ed-icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-
     .ed-canvas-area {
       flex: 1; position: relative; overflow: hidden;
       background-color: #26282f;
@@ -140,6 +149,8 @@ function injectStyles() {
       background-size: 20px 20px;
       cursor: crosshair;
       touch-action: none;
+      border-left: 1px solid var(--border);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), inset 0 18px 42px rgba(0,0,0,0.28);
     }
     .ed-canvas-stack {
       position: absolute; top: 0; left: 0; transform-origin: 0 0;
@@ -152,32 +163,34 @@ function injectStyles() {
       box-shadow: 0 0 0 1px rgba(0,0,0,0.5); pointer-events: none; z-index: 1001;
       transform: translate(-50%, -50%); display: none;
     }
-    .ed-zoom-row { display: flex; align-items: center; gap: 6px; }
+    .ed-zoom-row { display: flex; align-items: center; gap: 8px; }
     .ed-zoom-pct { flex: 1; text-align: center; font-size: 11.5px; color: var(--muted); }
 
     .ed-footer {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 18px; border-top: 1px solid var(--border); flex-shrink: 0;
+      padding: 16px 22px 18px; border-top: 1px solid var(--border); flex-shrink: 0;
       gap: 10px; flex-wrap: wrap;
     }
     .ed-footer-left { display: flex; gap: 8px; }
     .ed-footer-right { display: flex; gap: 8px; }
     .ed-btn {
-      padding: 9px 18px; border-radius: 100px; font-size: 12.5px; font-weight: 500;
+      padding: 9px 18px; border-radius: 8px; font-size: 12.5px; font-weight: 500;
       cursor: pointer; font-family: inherit; border: 1px solid var(--border);
-      background: var(--glass); color: var(--muted);
+      background: transparent; color: var(--muted); transition: all .15s;
     }
-    .ed-btn:hover { color: var(--text); }
+    .ed-btn:hover { color: var(--text); background: var(--glass); border-color: rgba(255,255,255,0.25); }
     .ed-btn-primary {
-      border-color: rgba(178,107,251,0.4); background: linear-gradient(135deg, var(--purple), var(--blue));
-      color: #fff;
+      border-color: transparent; background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: #fff; font-weight: 600;
     }
-    .ed-btn-primary:hover { filter: brightness(1.08); }
+    .ed-btn-primary:hover { color: #fff; filter: brightness(1.08); box-shadow: 0 8px 22px rgba(109,125,253,0.3); }
     .ed-hint { font-size: 10.5px; color: var(--muted-dim); padding: 0 18px 10px; }
 
     @media (max-width: 720px) {
       .ed-body { flex-direction: column; }
-      .ed-toolbar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; max-height: 40vh; }
+      .ed-toolbar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; max-height: 40vh; padding: 14px; }
+      .ed-tool-group { flex: 1 1 190px; }
+      .ed-canvas-area { border-left: none; }
       .ed-panel { height: 100vh; border-radius: 0; }
     }
   `;
@@ -194,14 +207,12 @@ function buildMarkup() {
         </div>
         <div class="ed-body">
           <div class="ed-toolbar">
-            <div>
+            <div class="ed-tool-group">
               <div class="ed-group-label">Brush</div>
               <div class="ed-mode-row">
                 <button class="ed-mode-btn active" data-mode="erase">🧽 Erase</button>
                 <button class="ed-mode-btn" data-mode="restore">🖌 Restore</button>
               </div>
-            </div>
-            <div>
               <div class="ed-slider-row">
                 <div class="ed-slider-label"><span>Brush size</span><span id="ed-size-val">40px</span></div>
                 <input type="range" class="ed-range" id="ed-size" min="4" max="200" value="40" />
@@ -211,7 +222,7 @@ function buildMarkup() {
                 <input type="range" class="ed-range" id="ed-feather" min="0" max="95" value="40" />
               </div>
             </div>
-            <div>
+            <div class="ed-tool-group">
               <div class="ed-group-label">View</div>
               <div class="ed-toggle-row" style="margin-bottom:10px">
                 <span>Show original overlay</span>
@@ -224,7 +235,7 @@ function buildMarkup() {
                 <button class="ed-icon-btn" id="ed-zoom-reset" title="Fit to view">⤢</button>
               </div>
             </div>
-            <div>
+            <div class="ed-tool-group">
               <div class="ed-group-label">Background</div>
               <div class="ed-bg-swatches" id="ed-bg-swatches">
                 <div class="ed-swatch transparent active" data-bg="transparent" title="Transparent"></div>
@@ -238,7 +249,7 @@ function buildMarkup() {
               <input type="file" id="ed-bg-file" accept="image/png,image/jpeg,image/webp" style="display:none" />
               <button class="ed-bg-upload" id="ed-bg-upload-btn">Upload background photo…</button>
             </div>
-            <div>
+            <div class="ed-tool-group">
               <div class="ed-group-label">History</div>
               <div class="ed-btn-row">
                 <button class="ed-icon-btn" id="ed-undo" disabled>↶ Undo</button>
@@ -522,7 +533,7 @@ function zoomAt(clientX, clientY, factor) {
 
 function fitToView() {
   const areaRect = els.canvasArea.getBoundingClientRect();
-  const pad = 32;
+  const pad = 16;
   const scale = Math.min(
     (areaRect.width - pad) / state.w,
     (areaRect.height - pad) / state.h,

@@ -208,12 +208,18 @@ function processFile(file) {
       </div>
     </div>
     <div class="card-info">
-      <div>
+      <div class="card-meta">
         <div class="card-name">${file.name}</div>
         <div class="card-size">${formatSize(file.size)}</div>
       </div>
       <div class="card-actions">
-        <button class="btn-edit" id="edit-${id}" disabled>Edit</button>
+        <button class="btn-edit" id="edit-${id}" disabled>
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+          </svg>
+          Edit
+        </button>
         <button class="btn-dl" id="dl-${id}" disabled>Download</button>
       </div>
     </div>

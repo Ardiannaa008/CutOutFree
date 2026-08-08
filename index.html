@@ -273,8 +273,8 @@
         padding: 10px 20px;
         border-radius: 100px;
         border: 1px solid var(--border);
-        background: var(--glass);
-        color: var(--text);
+        background: transparent;
+        color: var(--muted);
         font-family: inherit;
         font-weight: 500;
         font-size: 14px;
@@ -284,7 +284,8 @@
         white-space: nowrap;
       }
       .btn-ghost-pill:hover {
-        background: var(--glass-strong);
+        color: var(--text);
+        background: var(--glass);
         border-color: rgba(255, 255, 255, 0.18);
       }
 
@@ -901,13 +902,14 @@
         border-radius: 100px;
         border: 1px solid var(--border);
         background: transparent;
-        color: var(--text);
+        color: var(--muted);
         font-size: 13px;
         cursor: pointer;
         font-family: inherit;
         transition: all 0.2s;
       }
       .btn-ghost:hover {
+        color: var(--text);
         border-color: rgba(255, 255, 255, 0.25);
         background: var(--glass);
       }
@@ -915,17 +917,19 @@
       .btn-accent {
         padding: 8px 18px;
         border-radius: 100px;
-        border: none;
-        background: linear-gradient(100deg, var(--blue), var(--purple));
-        color: #fff;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text);
         font-size: 13px;
-        font-weight: 600;
+        font-weight: 500;
         cursor: pointer;
         font-family: inherit;
         transition: all 0.2s;
       }
       .btn-accent:hover {
-        box-shadow: 0 8px 22px rgba(109, 125, 253, 0.3);
+        color: var(--text);
+        border-color: rgba(255, 255, 255, 0.25);
+        background: var(--glass);
       }
 
       .image-grid {
@@ -1002,8 +1006,12 @@
       .card-info {
         padding: 12px 14px;
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .card-meta {
+        min-width: 0;
       }
       .card-name {
         font-size: 13px;
@@ -1011,7 +1019,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 140px;
+        max-width: 100%;
       }
       .card-size {
         font-size: 11px;
@@ -1022,16 +1030,22 @@
       .card-actions {
         display: flex;
         gap: 6px;
+        justify-content: flex-end;
         flex-shrink: 0;
+        min-width: 0;
       }
 
       .btn-dl,
       .btn-edit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
         padding: 6px 14px;
         border-radius: 100px;
-        border: 1px solid rgba(178, 107, 251, 0.35);
-        background: rgba(178, 107, 251, 0.08);
-        color: var(--purple);
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--muted);
         font-size: 12px;
         font-weight: 500;
         cursor: pointer;
@@ -1039,25 +1053,37 @@
         transition: all 0.2s;
         white-space: nowrap;
         flex-shrink: 0;
+        min-width: max-content;
+        min-height: 32px;
       }
-      .btn-dl:hover:not(:disabled),
       .btn-edit:hover:not(:disabled) {
-        background: rgba(178, 107, 251, 0.2);
-        border-color: var(--purple);
+        color: var(--text);
+        background: var(--glass);
+        border-color: rgba(255, 255, 255, 0.25);
+      }
+      .btn-dl {
+        border: none;
+        background: linear-gradient(100deg, var(--blue), var(--purple));
+        color: #fff;
+        font-weight: 600;
+      }
+      .btn-dl:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 22px rgba(109, 125, 253, 0.3);
       }
       .btn-dl:disabled,
       .btn-edit:disabled {
         opacity: 0.4;
         cursor: not-allowed;
       }
-      .btn-edit {
-        border-color: rgba(109, 125, 253, 0.35);
-        background: rgba(109, 125, 253, 0.08);
-        color: var(--blue);
+      .btn-dl:disabled {
+        transform: none;
+        box-shadow: none;
       }
-      .btn-edit:hover:not(:disabled) {
-        background: rgba(109, 125, 253, 0.2);
-        border-color: var(--blue);
+      .btn-edit svg {
+        width: 13px;
+        height: 13px;
+        stroke-width: 2;
       }
 
       /* ─── bottom stat bento ──────────────────────────────────────────── */
@@ -1207,7 +1233,7 @@
           <a href="/privacy.html">Privacy</a>
         </div>
         <div class="nav-right">
-          <a href="#upload" class="btn-grad">Try it free</a>
+          <a href="#upload" class="btn-ghost-pill">Try it free</a>
         </div>
       </nav>
 
