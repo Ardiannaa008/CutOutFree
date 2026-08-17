@@ -365,6 +365,16 @@ function formatSize(bytes) {
   return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 }
 
+function shouldUseMobileShareSave() {
+  const ua = navigator.userAgent || "";
+  const mobileUa = /Android|iPhone|iPad|iPod|webOS/i.test(ua);
+  const smallTouchScreen =
+    window.matchMedia?.("(hover: none) and (pointer: coarse)").matches &&
+    window.matchMedia?.("(max-width: 820px)").matches;
+
+  return mobileUa || smallTouchScreen;
+}
+
 async function triggerDownload(url, filename, blob) {
   //To track when the user downloads an image
   track("Image Downloaded");
@@ -374,7 +384,7 @@ async function triggerDownload(url, filename, blob) {
   // app never indexes (Android). The Web Share API opens the native
   // "Save Image" sheet instead, which saves straight into the camera roll.
   try {
-    if (navigator.canShare && (blob || url)) {
+    if (shouldUseMobileShareSave() && navigator.canShare && (blob || url)) {
       const fileBlob = blob || (await (await fetch(url)).blob());
       const file = new File([fileBlob], filename, {
         type: fileBlob.type || "image/png",
@@ -414,7 +424,7 @@ async function downloadAll() {
   // iOS and Android both surface a "Save Images" option on the share sheet
   // that saves the whole batch straight into the camera roll/gallery.
   try {
-    if (navigator.canShare) {
+    if (shouldUseMobileShareSave() && navigator.canShare) {
       const files = await Promise.all(
         doneJobs.map(async (job) => {
           const fileBlob = job.blob || (await (await fetch(job.url)).blob());
