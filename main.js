@@ -265,7 +265,7 @@ function processFile(file) {
         dlBtn.disabled = false;
         dlBtn.onclick = () => {
           const job = jobs.get(id);
-          triggerDownload(job.url, outName);
+          triggerDownload(job.url, outName, job.blob);
         };
       }
 
@@ -319,7 +319,10 @@ function openImageEditor(id) {
       const dlBtn = document.getElementById(`dl-${id}`);
       if (dlBtn) {
         const outName = job.name + "_cutout.png";
-        dlBtn.onclick = () => triggerDownload(jobs.get(id).url, outName);
+        dlBtn.onclick = () => {
+          const j = jobs.get(id);
+          triggerDownload(j.url, outName, j.blob);
+        };
       }
 
       job.url = newUrl;
@@ -362,10 +365,36 @@ function formatSize(bytes) {
   return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 }
 
-function triggerDownload(url, filename) {
+async function triggerDownload(url, filename, blob) {
   //To track when the user downloads an image
   track("Image Downloaded");
 
+  // On phones, a plain <a download> either does nothing (iOS Safari) or
+  // dumps the file into a generic Downloads folder that the Gallery/Photos
+  // app never indexes (Android). The Web Share API opens the native
+  // "Save Image" sheet instead, which saves straight into the camera roll.
+  try {
+    if (navigator.canShare && (blob || url)) {
+      const fileBlob = blob || (await (await fetch(url)).blob());
+      const file = new File([fileBlob], filename, {
+        type: fileBlob.type || "image/png",
+      });
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file] });
+          return;
+        } catch (err) {
+          // User cancelled the share sheet — treat as done, don't fall back.
+          if (err && err.name === "AbortError") return;
+          console.warn("Share failed, falling back to direct download:", err);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Share unavailable, falling back to direct download:", err);
+  }
+
+  // Fallback: desktop browsers, or any mobile browser without file-share support.
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
@@ -374,19 +403,61 @@ function triggerDownload(url, filename) {
   document.body.removeChild(a);
 }
 
-function downloadAll() {
-  let count = 0;
-  for (const [, job] of jobs) {
-    if (job.status === "done") {
-      setTimeout(
-        () => triggerDownload(job.url, job.name + "_cutout.png"),
-        count * 250,
-      );
-      count++;
-    }
+async function downloadAll() {
+  const doneJobs = [...jobs.values()].filter((j) => j.status === "done");
+  if (!doneJobs.length) {
+    showToast("⚠️ No images ready to download");
+    return;
   }
-  if (!count) showToast("⚠️ No images ready to download");
-  else showToast(`⬇️ Downloading ${count} image(s)…`);
+
+  // Web Share API Level 2 supports sharing multiple files in a single call —
+  // iOS and Android both surface a "Save Images" option on the share sheet
+  // that saves the whole batch straight into the camera roll/gallery.
+  try {
+    if (navigator.canShare) {
+      const files = await Promise.all(
+        doneJobs.map(async (job) => {
+          const fileBlob = job.blob || (await (await fetch(job.url)).blob());
+          return new File([fileBlob], job.name + "_cutout.png", {
+            type: fileBlob.type || "image/png",
+          });
+        }),
+      );
+
+      if (navigator.canShare({ files })) {
+        try {
+          await navigator.share({ files });
+          doneJobs.forEach(() => track("Image Downloaded"));
+          return;
+        } catch (err) {
+          // User cancelled the share sheet — treat as done, don't fall back.
+          if (err && err.name === "AbortError") return;
+          console.warn(
+            "Multi-file share failed, falling back to direct download:",
+            err,
+          );
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Share unavailable, falling back to direct download:", err);
+  }
+
+  // Fallback: desktop browsers, or any mobile browser without multi-file
+  // share support (older Android WebViews, some in-app browsers, etc).
+  doneJobs.forEach((job, i) => {
+    setTimeout(() => {
+      const a = document.createElement("a");
+      a.href = job.url;
+      a.download = job.name + "_cutout.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      track("Image Downloaded");
+    }, i * 250);
+  });
+
+  showToast(`⬇️ Downloading ${doneJobs.length} image(s)…`);
 }
 
 function clearAll() {
